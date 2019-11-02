@@ -87,11 +87,8 @@
       (message "This buffer might not be up to date; you may want to refresh it"))))
 
 (defun notmuch-bookmarks-add-prefix-maybe (s)
-  "Add `notmuch-bookmark-prefix' to S, if defined."
-  (when s
-    (if notmuch-bookmark-prefix
-	(concat notmuch-bookmark-prefix s)
-      s)))
+  "Add value of `notmuch-bookmark-prefix' to S, if defined."
+  (concat notmuch-bookmark-prefix s))
 
 (cl-defun notmuch-bookmarks-make-record (&key (handler 'notmuch-bookmarks-jump-handler)
 					      (name    nil)
