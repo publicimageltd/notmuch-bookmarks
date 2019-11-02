@@ -59,6 +59,11 @@
 ;; Go to bookmark record:
 
 
+(defun notmuch-bookmarks-assert-major-mode (a-major-mode)
+  "Throw an error if A-MAJOR-MODE is not supported by the package `notmuch-bookmarks'."
+  (unless (seq-contains'(notmuch-tree-mode notmuch-show-mode notmuch-search-mode) a-major-mode)
+    (user-error "Notmuch bookmarks does not support major mode '%s' " a-major-mode)))
+
 (defun notmuch-bookmarks-create (query major-mode)
   "Create a notmuch buffer of type MAJOR-MODE for query."
   (cl-case major-mode
@@ -67,11 +72,13 @@
     (notmuch-search-mode (notmuch-search query))))
 
 (cl-defun notmuch-bookmarks-jump-handler (bookmark)
+  "Standard handler for opening notmuch bookmarks."
   (let-alist (second bookmark)
-    (unless (seq-contains'(notmuch-tree-mode notmuch-show-mode notmuch-search-mode) .major-mode)
-      (user-error "Notmuch bookmarks not supported for major mode '%s' " .major-mode))
+    ;; do some sanity checks:
+    (notmuch-bookmarks-assert-major-mode .major-mode)
     (cl-assert (not (null .filename)) nil "Empty query string in bookmark record")
     (cl-assert (stringp .filename)    nil "Query is not a string object")
+    ;; either open existing buffer or create fresh one:
     (if (get-buffer .buffer-name)
 	(progn (switch-to-buffer .buffer-name)
 	       (message "This buffer might not be up to date; you may want to refresh it"))
