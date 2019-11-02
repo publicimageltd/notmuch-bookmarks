@@ -42,7 +42,6 @@
 (require 'notmuch)
 (require 'cl-lib)    ;; cl-defun; cl-defgeneric; cl-defmethod; cl-assert; cl-case
 (require 'seq)       ;; seq-doseq; seq-filter
-(require 'let-alist) ;; let-alist
 (require 'uniquify)
 
 ;; Variables:
@@ -73,16 +72,19 @@
 
 (cl-defun notmuch-bookmarks-jump-handler (bookmark)
   "Standard handler for opening notmuch bookmarks."
-  (let-alist (second bookmark)
+  (let* ((bm (second bookmark))
+	 (.filename    (alist-get 'filename bm))
+	 (.major-mode  (alist-get 'major-mode bm))
+	 (.buffer-name (alist-get 'buffer-name bm)))
     ;; do some sanity checks:
     (notmuch-bookmarks-assert-major-mode .major-mode)
     (cl-assert (not (null .filename)) nil "Empty query string in bookmark record")
-    (cl-assert (stringp .filename)    nil "Query is not a string object")
+    (cl-assert (stringp .filename)    nil "Bad definition of bookmark query")
     ;; either open existing buffer or create fresh one:
-    (if (get-buffer .buffer-name)
-	(progn (switch-to-buffer .buffer-name)
-	       (message "This buffer might not be up to date; you may want to refresh it"))
-      (notmuch-bookmarks-create .filename .major-mode))))
+    (if (not (get-buffer .buffer-name))
+	(notmuch-bookmarks-create .filename .major-mode)
+      (switch-to-buffer .buffer-name)
+      (message "This buffer might not be up to date; you may want to refresh it"))))
 
 (defun notmuch-bookmarks-add-prefix-maybe (s)
   "Add `notmuch-bookmark-prefix' to S, if defined."
