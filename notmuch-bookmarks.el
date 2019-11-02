@@ -40,27 +40,22 @@
 ;;; Code:
 
 (require 'notmuch)
+
 (require 'cl-lib)    ;; cl-defun; cl-defgeneric; cl-defmethod; cl-assert; cl-case
 (require 'seq)       ;; seq-doseq; seq-filter
 (require 'uniquify)
 
-;; Variables:
+;;; Custom Variables:
 
 (defcustom notmuch-bookmark-prefix "notmuch: "
   "Prefix to add to new notmuch bookmarks, or nil.")
 
-(defcustom notmuch-bookmarks-mode-list
-  '(notmuch-show-mode-hook
-    notmuch-tree-mode-hook
-    notmuch-search-mode-hook)
-  "List of notmuch modes to add bookmark handling to.")
 
-;; Go to bookmark record:
-
+;;; Jumping to a Bookmark:
 
 (defun notmuch-bookmarks-assert-major-mode (a-major-mode)
   "Throw an error if A-MAJOR-MODE is not supported by the package `notmuch-bookmarks'."
-  (unless (seq-contains'(notmuch-tree-mode notmuch-show-mode notmuch-search-mode) a-major-mode)
+  (unless (seq-contains '(notmuch-show-mode notmuch-tree-mode notmuch-search-mode) a-major-mode)
     (user-error "Notmuch bookmarks does not support major mode '%s' " a-major-mode)))
 
 (defun notmuch-bookmarks-create (query major-mode)
@@ -72,10 +67,9 @@
 
 (cl-defun notmuch-bookmarks-jump-handler (bookmark)
   "Standard handler for opening notmuch bookmarks."
-  (let* ((bm (second bookmark))
-	 (.filename    (alist-get 'filename bm))
-	 (.major-mode  (alist-get 'major-mode bm))
-	 (.buffer-name (alist-get 'buffer-name bm)))
+  (let* ((.filename    (bookmark-prop-get bookmark 'filename))
+	 (.major-mode  (bookmark-prop-get bookmark 'major-mode))
+	 (.buffer-name (bookmark-prop-get bookmark 'buffer-name)))
     ;; do some sanity checks:
     (notmuch-bookmarks-assert-major-mode .major-mode)
     (cl-assert (not (null .filename)) nil "Empty query string in bookmark record")
@@ -85,6 +79,8 @@
 	(notmuch-bookmarks-create .filename .major-mode)
       (switch-to-buffer .buffer-name)
       (message "This buffer might not be up to date; you may want to refresh it"))))
+
+;;; Creating a Bookmark:
 
 (cl-defun notmuch-bookmarks-make-record (&key (handler 'notmuch-bookmarks-jump-handler)
 					      (name    nil)
@@ -101,48 +97,46 @@
 
 (defun notmuch-bookmarks-record-p (bookmark)
   "Test whether BOOKMARK points to a notmuch query buffer."
-  (eq 'notmuch-bookmarks-jump-handler
-      (bookmark-prop-get bookmark 'handler)))
-
-;; generic record  functions:
+  (eq 'notmuch-bookmarks-jump-handler (bookmark-prop-get bookmark 'handler)))
 
 (cl-defgeneric notmuch-bookmarks-record ()
-  "Return a bookmark record for a notmuch buffer."
+  "Return a bookmark record for the current notmuch buffer."
   (error "No bookmark handling defined for this major mode."))
 
 (cl-defgeneric notmuch-bookmarks-record (&context (major-mode notmuch-tree-mode))
-  "Return a bookmark record for a notmuch tree buffer."
+  "Return a bookmark record for the current notmuch tree buffer."
   (notmuch-bookmarks-make-record :filename (notmuch-tree-get-query)))
   
 (cl-defgeneric notmuch-bookmarks-record (&context (major-mode notmuch-show-mode))
-    "Return a bookmark record for a notmuch show buffer."
+    "Return a bookmark record for the current notmuch show buffer."
   (notmuch-bookmarks-make-record :filename (notmuch-show-get-query)))
   
 (cl-defgeneric notmuch-bookmarks-record (&context (major-mode notmuch-search-mode))
-    "Return a bookmark record for a notmuch search buffer."
+    "Return a bookmark record for the current notmuch search buffer."
   (notmuch-bookmarks-make-record :filename (notmuch-search-get-query)))
 
-;; install or uninstall the bookmark functionality:
+;; Install or uninstall the bookmark functionality:
 
 (defun notmuch-bookmarks-set-record-fn ()
-  "Set up local notmuch bookmark handling in current buffer.
+  "Set up notmuch bookmark handling for the current buffer.
 Function to be added to a major mode hook."
+  (notmuch-bookmarks-assert-major-mode major-mode)
   (setq-local bookmark-make-record-function 'notmuch-bookmarks-record))
 
 (defun notmuch-bookmarks-install (&optional uninstall)
-  "Add or optionally remove local bookmark handlers for all notmuch modes."
+  "Add or optionally remove notmuch bookmark handlers."
   (let* ((hook-fn (if uninstall 'remove-hook 'add-hook)))
-    (seq-doseq (hook-name notmuch-bookmarks-mode-list)
+    (seq-doseq (hook-name '(notmuch-show-mode-hook
+			    notmuch-search-mode-hook
+			    notmuch-tree-mode-hook))
       (funcall hook-fn hook-name 'notmuch-bookmarks-set-record-fn))))
-
-;; (notmuch-bookmarks-install)
 
 (define-minor-mode notmuch-bookmarks
   "Add notmuch specific bookmarks to the bookmarking system."
   :global t
   (notmuch-bookmarks-install (not notmuch-bookmarks)))
 
-;; convenience
+;; Convenience:
 
 (defun notmuch-bookmarks-alist ()
   "Return a copy of `bookmark-alist' with notmuch bookmarks only."
@@ -152,8 +146,10 @@ Function to be added to a major mode hook."
 (defun notmuch-bookmarks-counsel ()
   "Call `counsel-bookmarks' with a reduced bookmark set."
   (interactive)
-  (let ((bookmark-alist (notmuch-bookmarks-alist)))
-    (counsel-bookmark)))
+  (if (not (require 'counsel nil t))
+      (user-error "This function requires the package `counsel' to be installed")
+    (let ((bookmark-alist (notmuch-bookmarks-alist)))
+      (counsel-bookmark)))
 
 (provide 'notmuch-bookmarks)
 ;;; notmuch-bookmarks.el ends here
