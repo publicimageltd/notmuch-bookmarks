@@ -86,15 +86,11 @@
       (switch-to-buffer .buffer-name)
       (message "This buffer might not be up to date; you may want to refresh it"))))
 
-(defun notmuch-bookmarks-add-prefix-maybe (s)
-  "Add value of `notmuch-bookmark-prefix' to S, if defined."
-  (concat notmuch-bookmark-prefix s))
-
 (cl-defun notmuch-bookmarks-make-record (&key (handler 'notmuch-bookmarks-jump-handler)
 					      (name    nil)
 					      filename position annotation)
   "Turn argument list into a bookmark record list."
-  `(,(notmuch-bookmarks-add-prefix-maybe name)
+  `(,(concat notmuch-bookmark-prefix name)
     ((handler  . ,handler)
      (filename . ,filename)
      (major-mode . ,major-mode)
