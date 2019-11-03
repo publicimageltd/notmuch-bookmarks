@@ -21,11 +21,11 @@
 ;;; Commentary:
 
 ;; This package adds a global minor mode which allows you to bookmark
-;; notmuch buffers using the standard emacs bookmark functionality. A
+;; notmuch buffers via the standard emacs bookmark functionality. A
 ;; `notmuch buffer' denotes either a notmuch tree view, a notmuch
 ;; search view or a notmuch show buffer (message view). With this
-;; minor mode active, you can add these buffers to the bookmark list
-;; and visit them using `bookmark-jump'.
+;; minor mode active, you can add these buffers to the standard
+;; bookmark list and visit them, e.g. by using `bookmark-jump'.
 ;;
 ;; To activate the minor mode, add something like the following to
 ;; your init file:
@@ -35,7 +35,8 @@
 ;;   :config
 ;;   (notmuch-bookmarks))
 ;;
-
+;; This package is NOT part of the official notmuch emacs suite.
+;;
 
 ;;; Code:
 
@@ -44,12 +45,12 @@
 (require 'cl-lib)    ;; cl-defun; cl-defgeneric; cl-defmethod; cl-assert; cl-case
 (require 'seq)       ;; seq-doseq; seq-filter
 (require 'uniquify)
+(require 'bookmark)
 
 ;;; Custom Variables:
 
 (defcustom notmuch-bookmark-prefix "notmuch: "
   "Prefix to add to new notmuch bookmarks, or nil.")
-
 
 ;;; Jumping to a Bookmark:
 
@@ -136,11 +137,24 @@ Function to be added to a major mode hook."
   :global t
   (notmuch-bookmarks-install (not notmuch-bookmarks)))
 
-;; Convenience:
+;; Provide some easier access to notmuch bookmarks:
+
+(defun notmuch-bookmarks-get-buffer-bookmark (&optional buffer)
+  "Return the bookmark pointing to BUFFER, if any."
+  (let* ((buffer-name
+	  (with-current-buffer (or buffer (current-buffer))
+	    (buffer-name))))
+    (seq-find (lambda (bm)
+		(string-equal (bookmark-prop-get bm 'buffer-name)
+			      buffer-name))
+	      (seq-filter #'notmuch-bookmarks-record-p
+			  bookmark-alist))))
 
 (defun notmuch-bookmarks-alist ()
-  "Return a copy of `bookmark-alist' with notmuch bookmarks only."
+  "Return list of all notmuch bookmarks."
   (seq-filter #'notmuch-bookmarks-record-p bookmark-alist))
+
+;; Convenience:
 
 ;;;###autoload
 (defun notmuch-bookmarks-counsel ()
@@ -149,7 +163,7 @@ Function to be added to a major mode hook."
   (if (not (require 'counsel nil t))
       (user-error "This function requires the package `counsel' to be installed")
     (let ((bookmark-alist (notmuch-bookmarks-alist)))
-      (counsel-bookmark)))
+      (counsel-bookmark))))
 
 (provide 'notmuch-bookmarks)
 ;;; notmuch-bookmarks.el ends here
