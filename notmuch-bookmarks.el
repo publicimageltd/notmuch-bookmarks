@@ -84,17 +84,30 @@
 ;;; Creating a Bookmark:
 
 (cl-defun notmuch-bookmarks-make-record (&key (handler 'notmuch-bookmarks-jump-handler)
+					      (a-major-mode major-mode)
 					      (name    nil)
+					      a-buffer-name
 					      filename position annotation)
   "Turn argument list into a bookmark record list."
   `(,(concat notmuch-bookmark-prefix name)
     ((handler  . ,handler)
      (filename . ,filename)
-     (major-mode . ,major-mode)
-     (buffer-name . ,(or (uniquify-buffer-base-name)
-			 (buffer-name)))
+     (major-mode . ,a-major-mode)
+     (buffer-name . ,a-buffer-name)
      (annotation . ,annotation)
      (position . ,position))))
+
+(defun notmuch-bookmarks-copy-bookmark (bookmark)
+  "Copies BOOKMARK and discards any additional data, e.g. alerts."
+  (cl-assert (notmuch-bookmarks-record-p bookmark))
+  (notmuch-bookmarks-make-record
+   :name         (bookmark-name-from-full-record bookmark)
+   :handler      (bookmark-prop-get bookmark 'handler)
+   :filename     (bookmark-prop-get bookmark 'filename)
+   :a-major-mode (bookmark-prop-get bookmark 'major-mode)
+   :position     (bookmark-prop-get bookmark 'position)
+   :annotation   (bookmark-prop-get bookmark 'annotation)
+   :a-buffer-name   (bookmark-prop-get bookmark 'buffer-name)))
 
 (defun notmuch-bookmarks-record-p (bookmark)
   "Test whether BOOKMARK points to a notmuch query buffer."
@@ -106,15 +119,21 @@
 
 (cl-defgeneric notmuch-bookmarks-record (&context (major-mode notmuch-tree-mode))
   "Return a bookmark record for the current notmuch tree buffer."
-  (notmuch-bookmarks-make-record :filename (notmuch-tree-get-query)))
+  (notmuch-bookmarks-make-record :filename (notmuch-tree-get-query)
+				 :a-buffer-name (buffer-name)
+				 :a-major-mode 'notmuch-tree-mode))
   
 (cl-defgeneric notmuch-bookmarks-record (&context (major-mode notmuch-show-mode))
     "Return a bookmark record for the current notmuch show buffer."
-  (notmuch-bookmarks-make-record :filename (notmuch-show-get-query)))
+    (notmuch-bookmarks-make-record :filename (notmuch-show-get-query)
+				   :a-buffer-name (buffer-name)
+				   :a-major-mode 'notmuch-show-mode))
   
 (cl-defgeneric notmuch-bookmarks-record (&context (major-mode notmuch-search-mode))
     "Return a bookmark record for the current notmuch search buffer."
-  (notmuch-bookmarks-make-record :filename (notmuch-search-get-query)))
+    (notmuch-bookmarks-make-record :filename (notmuch-search-get-query)
+				   :a-buffer-name (buffer-name)
+				   :a-major-mode 'notmuch-search-mode))
 
 ;; Install or uninstall the bookmark functionality:
 
