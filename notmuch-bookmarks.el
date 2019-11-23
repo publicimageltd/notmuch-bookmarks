@@ -93,7 +93,9 @@
     ((handler  . ,handler)
      (filename . ,filename)
      (major-mode . ,a-major-mode)
-     (buffer-name . ,a-buffer-name)
+     (buffer-name . ,(or (with-current-buffer a-buffer-name
+			  (uniquify-buffer-base-name))
+			 a-buffer-name))
      (annotation . ,annotation)
      (position . ,position))))
 
