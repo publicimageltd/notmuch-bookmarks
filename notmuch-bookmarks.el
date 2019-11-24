@@ -160,6 +160,11 @@ Function to be added to a major mode hook."
 
 ;; Provide some easier access to notmuch bookmarks:
 
+(defun notmuch-bookmarks-query (bookmark)
+  "Return the BOOKMARK's query, iff it is a notmuch bookmark."
+  (when (notmuch-bookmarks-record-p bookmark)
+    (bookmark-prop-get bookmark 'filename)))
+
 (defun notmuch-bookmarks-get-buffer-bookmark (&optional buffer)
   "Return the bookmark pointing to BUFFER, if any."
   (let* ((buffer-name
