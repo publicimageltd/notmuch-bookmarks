@@ -90,14 +90,14 @@
 					      filename position annotation)
   "Turn argument list into a bookmark record list."
   `(,(concat notmuch-bookmark-prefix name)
-    ((handler  . ,handler)
-     (filename . ,filename)
-     (major-mode . ,a-major-mode)
-     (buffer-name . ,(or (with-current-buffer a-buffer-name
+    (handler  . ,handler)
+    (filename . ,filename)
+    (major-mode . ,a-major-mode)
+    (buffer-name . ,(or (with-current-buffer a-buffer-name
 			  (uniquify-buffer-base-name))
-			 a-buffer-name))
-     (annotation . ,annotation)
-     (position . ,position))))
+			a-buffer-name))
+    (annotation . ,annotation)
+    (position . ,position)))
 
 (defun notmuch-bookmarks-copy-bookmark (bookmark)
   "Copies BOOKMARK and discards any additional data, e.g. alerts."
