@@ -81,6 +81,28 @@
       (switch-to-buffer .buffer-name)
       (message "This buffer might not be up to date; you may want to refresh it"))))
 
+;;; Providing unified access across all notmuch modes:
+
+(cl-defgeneric notmuch-bookmarks-get-buffer-query (&optional buffer)
+  "Return the notmuch query of BUFFER."
+  (user-error "Not defined for this type of buffer."))
+
+(cl-defmethod notmuch-bookmarks-get-buffer-query (&context (major-mode notmuch-tree-mode) &optional buffer)
+  "Return the query for notmuch tree mode BUFFER."
+  (with-current-buffer (or buffer (current-buffer))
+    (notmuch-tree-get-query)))
+
+(cl-defmethod notmuch-bookmarks-get-buffer-query (&context (major-mode notmuch-search-mode) &optional buffer)
+  "Return the query for notmuch search mode BUFFER."
+  (with-current-buffer (or buffer (current-buffer))
+    (notmuch-search-get-query)))
+
+(cl-defmethod notmuch-bookmarks-get-buffer-query (&context (major-mode notmuch-show-mode) &optional buffer)
+  "Return the query for notmuch search mode BUFFER."
+  (with-current-buffer (or buffer (current-buffer))
+    (notmuch-show-get-query)))
+
+
 ;;; Creating a Bookmark:
 
 (cl-defun notmuch-bookmarks-make-record (&key (handler 'notmuch-bookmarks-jump-handler)
@@ -115,25 +137,31 @@
   "Test whether BOOKMARK points to a notmuch query buffer."
   (eq 'notmuch-bookmarks-jump-handler (bookmark-prop-get bookmark 'handler)))
 
+;; FIXME Since all mode specific handling is delegated to
+;; `notmuch-bookmarks-get-buffer-query', there is actually no need
+;; anymore to use a generic function. It could be replaced by one
+;; non-generic function which simply uses the value of major mode to
+;; create the record. If no other reason pops up, we'll change it.
+
 (cl-defgeneric notmuch-bookmarks-record ()
   "Return a bookmark record for the current notmuch buffer."
   (error "No bookmark handling defined for this major mode."))
 
 (cl-defgeneric notmuch-bookmarks-record (&context (major-mode notmuch-tree-mode))
   "Return a bookmark record for the current notmuch tree buffer."
-  (notmuch-bookmarks-make-record :filename (notmuch-tree-get-query)
+  (notmuch-bookmarks-make-record :filename (notmuch-bookmarks-get-buffer-query)
 				 :a-buffer-name (buffer-name)
 				 :a-major-mode 'notmuch-tree-mode))
   
 (cl-defgeneric notmuch-bookmarks-record (&context (major-mode notmuch-show-mode))
     "Return a bookmark record for the current notmuch show buffer."
-    (notmuch-bookmarks-make-record :filename (notmuch-show-get-query)
+    (notmuch-bookmarks-make-record :filename (notmuch-bookmarks-get-buffer-query)
 				   :a-buffer-name (buffer-name)
 				   :a-major-mode 'notmuch-show-mode))
   
 (cl-defgeneric notmuch-bookmarks-record (&context (major-mode notmuch-search-mode))
     "Return a bookmark record for the current notmuch search buffer."
-    (notmuch-bookmarks-make-record :filename (notmuch-search-get-query)
+    (notmuch-bookmarks-make-record :filename (notmuch-show-get-query)
 				   :a-buffer-name (buffer-name)
 				   :a-major-mode 'notmuch-search-mode))
 
