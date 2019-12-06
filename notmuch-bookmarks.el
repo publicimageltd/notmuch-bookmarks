@@ -42,8 +42,8 @@
 
 (require 'notmuch)
 
-(require 'cl-lib)    ;; cl-defun; cl-defgeneric; cl-defmethod; cl-assert; cl-case
-(require 'seq)       ;; seq-doseq; seq-filter
+(require 'cl-lib)
+(require 'seq)   
 (require 'uniquify)
 (require 'bookmark)
 
