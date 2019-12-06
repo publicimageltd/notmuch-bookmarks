@@ -121,6 +121,19 @@
     (annotation . ,annotation)
     (position . ,position)))
 
+(defun notmuch-bookmarks-record ()
+  "Return a bookmark record for the current notmuch buffer."
+  (if-let* ((query (notmuch-bookmarks-get-buffer-query)))
+      (notmuch-bookmarks-make-record :filename query
+				     :a-buffer-name (buffer-name)
+				     :a-major-mode major-mode)
+    ;; actually, this part of the conditional should never be reached,
+    ;; since `notmuch-bookmarks-get-buffer-query' already throws an
+    ;; error if called within an unrecognized buffer:
+    (user-error "Could not find a query associated with the current buffer, no bookmark made")))
+
+;; Diverse usefull stuff for working with bookmarks:
+
 (defun notmuch-bookmarks-copy-bookmark (bookmark)
   "Copies BOOKMARK and discards any additional data, e.g. alerts."
   (cl-assert (notmuch-bookmarks-record-p bookmark))
@@ -137,33 +150,43 @@
   "Test whether BOOKMARK points to a notmuch query buffer."
   (eq 'notmuch-bookmarks-jump-handler (bookmark-prop-get bookmark 'handler)))
 
-;; FIXME Since all mode specific handling is delegated to
-;; `notmuch-bookmarks-get-buffer-query', there is actually no need
-;; anymore to use a generic function. It could be replaced by one
-;; non-generic function which simply uses the value of major mode to
-;; create the record. If no other reason pops up, we'll change it.
 
-(cl-defgeneric notmuch-bookmarks-record ()
-  "Return a bookmark record for the current notmuch buffer."
-  (error "No bookmark handling defined for this major mode."))
+(defun notmuch-bookmarks-query (bookmark)
+  "Return the BOOKMARK's query, iff it is a notmuch bookmark."
+  (when (notmuch-bookmarks-record-p bookmark)
+    (bookmark-prop-get bookmark 'filename)))
 
-(cl-defgeneric notmuch-bookmarks-record (&context (major-mode notmuch-tree-mode))
-  "Return a bookmark record for the current notmuch tree buffer."
-  (notmuch-bookmarks-make-record :filename (notmuch-bookmarks-get-buffer-query)
-				 :a-buffer-name (buffer-name)
-				 :a-major-mode 'notmuch-tree-mode))
-  
-(cl-defgeneric notmuch-bookmarks-record (&context (major-mode notmuch-show-mode))
-    "Return a bookmark record for the current notmuch show buffer."
-    (notmuch-bookmarks-make-record :filename (notmuch-bookmarks-get-buffer-query)
-				   :a-buffer-name (buffer-name)
-				   :a-major-mode 'notmuch-show-mode))
-  
-(cl-defgeneric notmuch-bookmarks-record (&context (major-mode notmuch-search-mode))
-    "Return a bookmark record for the current notmuch search buffer."
-    (notmuch-bookmarks-make-record :filename (notmuch-show-get-query)
-				   :a-buffer-name (buffer-name)
-				   :a-major-mode 'notmuch-search-mode))
+(defun notmuch-bookmarks-get-buffer-bookmark (&optional buffer)
+  "Return the bookmark pointing to BUFFER, if any."
+  (let* ((buffer-name
+	  (with-current-buffer (or buffer (current-buffer))
+	    (buffer-name))))
+    (seq-find (lambda (bm)
+		(string-equal (bookmark-prop-get bm 'buffer-name)
+			      buffer-name))
+	      (seq-filter #'notmuch-bookmarks-record-p
+			  bookmark-alist))))
+
+;;;###autoload
+(defun notmuch-bookmarks-edit (&optional bookmark called-interactively)
+  "Edit the query of notmuch bookmark BOOKMARK."
+  (interactive (list (notmuch-bookmarks-get-buffer-bookmark) t))
+  (if (not bookmark)
+      (user-error "No bookmark defined")
+    (let* ((calling_buf (current-buffer))
+	   (old_query  (notmuch-bookmarks-query bookmark))
+	   (new_query  (notmuch-read-query "Enter new query for this bookmark: "))
+	   (major_mode (bookmark-prop-get bookmark 'major-mode)))
+      (bookmark-delete (bookmark-name-from-full-record bookmark))
+      (cl-case major_mode
+	('notmuch-tree-mode   (notmuch-tree new_query))
+	('notmuch-search-mode (notmuch-search new_query))
+	('notmuch-show-mode   (notmuch-show new_query)))
+      (bookmark-set (concat notmuch-bookmark-prefix (buffer-name)))
+      (when called-interactively
+	  (kill-buffer calling_buf)))))
+
+
 
 ;; Install or uninstall the bookmark functionality:
 
@@ -185,39 +208,6 @@ Function to be added to a major mode hook."
   "Add notmuch specific bookmarks to the bookmarking system."
   :global t
   (notmuch-bookmarks-install (not notmuch-bookmarks)))
-
-;; Provide some easier access to notmuch bookmarks:
-
-(defun notmuch-bookmarks-query (bookmark)
-  "Return the BOOKMARK's query, iff it is a notmuch bookmark."
-  (when (notmuch-bookmarks-record-p bookmark)
-    (bookmark-prop-get bookmark 'filename)))
-
-(defun notmuch-bookmarks-get-buffer-bookmark (&optional buffer)
-  "Return the bookmark pointing to BUFFER, if any."
-  (let* ((buffer-name
-	  (with-current-buffer (or buffer (current-buffer))
-	    (buffer-name))))
-    (seq-find (lambda (bm)
-		(string-equal (bookmark-prop-get bm 'buffer-name)
-			      buffer-name))
-	      (seq-filter #'notmuch-bookmarks-record-p
-			  bookmark-alist))))
-
-(defun notmuch-bookmarks-alist ()
-  "Return list of all notmuch bookmarks."
-  (seq-filter #'notmuch-bookmarks-record-p bookmark-alist))
-
-;; Convenience:
-
-;;;###autoload
-(defun notmuch-bookmarks-counsel ()
-  "Call `counsel-bookmarks' with a reduced bookmark set."
-  (interactive)
-  (if (not (require 'counsel nil t))
-      (user-error "This function requires the package `counsel' to be installed")
-    (let ((bookmark-alist (notmuch-bookmarks-alist)))
-      (counsel-bookmark))))
 
 (provide 'notmuch-bookmarks)
 ;;; notmuch-bookmarks.el ends here
