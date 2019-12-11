@@ -20,7 +20,7 @@ This package adds a global minor mode which allows you to bookmark
 
  This package is NOT part of the official notmuch emacs suite.
 
-# Feautures
+# Features
 
  - Specific jump handlers for notmuch buffers
  - Some API
