@@ -168,26 +168,23 @@
 			  bookmark-alist))))
 
 ;;;###autoload
-(defun notmuch-bookmarks-edit (&optional bookmark called-interactively)
+(defun notmuch-bookmarks-edit-query (&optional bookmark called-interactively)
   "Edit the query of notmuch bookmark BOOKMARK."
   (interactive (list (notmuch-bookmarks-get-buffer-bookmark) t))
   (if (not bookmark)
       (user-error "No bookmark defined")
-    (let* ((calling_buf (current-buffer))
-	   (old_query  (notmuch-bookmarks-query bookmark))
-	   (new_query  (notmuch-read-query "Enter new query for this bookmark: "))
-	   (major_mode (bookmark-prop-get bookmark 'major-mode)))
-      (bookmark-delete (bookmark-name-from-full-record bookmark))
-      (cl-case major_mode
-	('notmuch-tree-mode   (notmuch-tree new_query))
-	('notmuch-search-mode (notmuch-search new_query))
-	('notmuch-show-mode   (notmuch-show new_query)))
-      (bookmark-set (concat notmuch-bookmark-prefix (buffer-name)))
-      (when called-interactively
-	  (kill-buffer calling_buf)))))
-
-
-
+    (if (not (notmuch-bookmarks-record-p bookmark))
+	(user-error "Bookmark not a notmuch bookmark")
+      (let* ((calling-buf (current-buffer))
+	     (old_query   (notmuch-bookmarks-query bookmark))
+	     (new-query   (notmuch-read-query (format "Replace current query '%s' with: " old_query))))
+	(bookmark-prop-set bookmark 'filename new-query)
+	(when called-interactively
+	  (kill-buffer calling-buf))
+	(notmuch-bookmarks-create new-query (bookmark-prop-get bookmark 'major-mode))
+	(bookmark-prop-set bookmark 'buffer-name (buffer-name))
+	(message "Bookmark has been changed")))))
+	   
 ;; Install or uninstall the bookmark functionality:
 
 (defun notmuch-bookmarks-set-record-fn ()
