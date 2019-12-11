@@ -25,6 +25,25 @@ This package adds a global minor mode which allows you to bookmark
  - Specific jump handlers for notmuch buffers
  - Some API
 
+# Interactive Functions
+
+## Generic bookmark handling
+
+In order to use this package, you can use the ordinary bookmark
+functionality shipped with vanilla emacs. That is, when in a notmuch
+buffer, you might simply set a bookmark the usual way (via
+`bookmark-set`). The notmuch bookmarks are also included in the
+display of `bookmark-bmenu-list`. To jump to a notmuch bookmark, use
+`bookmark-jump`.
+
+## notmuch-bookmarks-edit-query
+
+Edit the query with the bookmark the current buffer is visiting.
+
+## notmuch-bookmarks-edit-name
+
+Edit the name of the bookmark the current buffer is visiting.
+
 # Known Limitations
 
  - Multiple buffer names (which are usually handled by `uniquify`) are
