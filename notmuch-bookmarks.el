@@ -168,6 +168,19 @@
 			  bookmark-alist))))
 
 ;;;###autoload
+(defun notmuch-bookmarks-edit-name (&optional bookmark called-interactively)
+  "Edit the name of notmuch bookmark BOOKMARK."
+  (interactive (list (notmuch-bookmarks-get-buffer-bookmark) t))
+  (if (not bookmark)
+      (user-error "No bookmark defined")
+    (let* ((old-name (bookmark-name-from-full-record bookmark))
+	   (new-name (read-from-minibuffer (format "Replace name '%s' with new name: " old-name))))
+      (unless (string-empty-p (string-trim new-name))
+	(bookmark-set-name bookmark new-name)
+	(message "Bookmark name has been changed.")))))
+
+
+;;;###autoload
 (defun notmuch-bookmarks-edit-query (&optional bookmark called-interactively)
   "Edit the query of notmuch bookmark BOOKMARK."
   (interactive (list (notmuch-bookmarks-get-buffer-bookmark) t))
