@@ -52,6 +52,16 @@
 (defcustom notmuch-bookmark-prefix "notmuch: "
   "Prefix to add to new notmuch bookmarks, or nil.")
 
+;; Integrating in bookmarks package:
+
+(defun notmuch-bookmarks-sync-updates ()
+  "Keep bmenu and saved bookmarks in sync with changes."
+  (setq bookmark-alist-modification-count
+	(1+ bookmark-alist-modification-count))
+  (if (bookmark-time-to-save-p)
+      (bookmark-save))
+  (bookmark-bmenu-surreptitiously-rebuild-list))
+
 ;;; Jumping to a Bookmark:
 
 (defun notmuch-bookmarks-assert-major-mode (a-major-mode)
@@ -177,8 +187,8 @@
 	   (new-name (read-from-minibuffer (format "Replace name '%s' with new name: " old-name))))
       (unless (string-empty-p (string-trim new-name))
 	(bookmark-set-name bookmark new-name)
+	(notmuch-bookmarks-sync-updates)
 	(message "Bookmark name has been changed.")))))
-
 
 ;;;###autoload
 (defun notmuch-bookmarks-edit-query (&optional bookmark called-interactively)
@@ -196,8 +206,18 @@
 	  (kill-buffer calling-buf))
 	(notmuch-bookmarks-create new-query (bookmark-prop-get bookmark 'major-mode))
 	(bookmark-prop-set bookmark 'buffer-name (buffer-name))
+	(notmuch-bookmarks-sync-updates)
 	(message "Bookmark has been changed")))))
-	   
+
+;; Let bookmark-relocate handle notmuch bookmarks:
+
+(defun notmuch-bookmarks-relocate-wrapper (orig-fun bookmark-name)
+  "Treat notmuch bookmarks differently when 'relocating' bookmarks."
+  (if (notmuch-bookmarks-record-p bookmark-name)
+      (notmuch-bookmarks-edit-query bookmark-name
+				    (called-interactively-p))
+    (funcall orig-fun bookmark-name)))
+
 ;; Install or uninstall the bookmark functionality:
 
 (defun notmuch-bookmarks-set-record-fn ()
@@ -207,12 +227,17 @@ Function to be added to a major mode hook."
   (setq-local bookmark-make-record-function 'notmuch-bookmarks-record))
 
 (defun notmuch-bookmarks-install (&optional uninstall)
-  "Add or optionally remove notmuch bookmark handlers."
+  "Set up all hooks and advices for `notmuch-bookmarks-mode'."
   (let* ((hook-fn (if uninstall 'remove-hook 'add-hook)))
     (seq-doseq (hook-name '(notmuch-show-mode-hook
 			    notmuch-search-mode-hook
 			    notmuch-tree-mode-hook))
-      (funcall hook-fn hook-name 'notmuch-bookmarks-set-record-fn))))
+      (funcall hook-fn hook-name 'notmuch-bookmarks-set-record-fn)))
+  (if uninstall
+      (advice-remove 'bookmark-relocate
+		     'notmuch-bookmarks-relocate-wrapper)
+    (advice-add 'bookmark-relocate
+	    :around 'notmuch-bookmarks-relocate-wrapper)))
 
 (define-minor-mode notmuch-bookmarks
   "Add notmuch specific bookmarks to the bookmarking system."
