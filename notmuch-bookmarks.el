@@ -179,7 +179,6 @@
 	(bookmark-set-name bookmark new-name)
 	(message "Bookmark name has been changed.")))))
 
-
 ;;;###autoload
 (defun notmuch-bookmarks-edit-query (&optional bookmark called-interactively)
   "Edit the query of notmuch bookmark BOOKMARK."
@@ -197,7 +196,19 @@
 	(notmuch-bookmarks-create new-query (bookmark-prop-get bookmark 'major-mode))
 	(bookmark-prop-set bookmark 'buffer-name (buffer-name))
 	(message "Bookmark has been changed")))))
-	   
+
+;; Let bookmark-relocate handle notmuch bookmarks:
+
+(defun notmuch-bookmarks-relocate-wrapper (orig-fun bookmark-name)
+  "Treat notmuch bookmarks differently when 'relocating' bookmarks."
+  (if (notmuch-bookmarks-record-p bookmark-name)
+      (notmuch-bookmarks-edit-query bookmark-name
+				    (called-interactively-p))
+    (funcall orig-fun bookmark-name)))
+
+(advice-add 'bookmark-relocate
+	    :around 'notmuch-bookmarks-relocate-wrapper)
+
 ;; Install or uninstall the bookmark functionality:
 
 (defun notmuch-bookmarks-set-record-fn ()
