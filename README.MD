@@ -41,7 +41,7 @@ functionality shipped with vanilla emacs. That is, when in a notmuch
 buffer, you might simply set a bookmark the usual way (via
 `bookmark-set`). The notmuch bookmarks are also included in the
 display of `bookmark-bmenu-list`. You can use the search feature (key
-'/') to narrow the bookmark lists down to all bookmaks with the prefix
+'/') to narrow down the bookmark lists to all bookmarks with the prefix
 `notmuch:`.
 
 ## notmuch-bookmarks-edit-query
