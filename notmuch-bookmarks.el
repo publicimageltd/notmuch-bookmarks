@@ -187,6 +187,7 @@
 	   (new-name (read-from-minibuffer (format "Replace name '%s' with new name: " old-name))))
       (unless (string-empty-p (string-trim new-name))
 	(bookmark-set-name bookmark new-name)
+	(notmuch-bookmarks-sync-updates)
 	(message "Bookmark name has been changed.")))))
 
 ;;;###autoload
@@ -205,6 +206,7 @@
 	  (kill-buffer calling-buf))
 	(notmuch-bookmarks-create new-query (bookmark-prop-get bookmark 'major-mode))
 	(bookmark-prop-set bookmark 'buffer-name (buffer-name))
+	(notmuch-bookmarks-sync-updates)
 	(message "Bookmark has been changed")))))
 
 ;; Let bookmark-relocate handle notmuch bookmarks:
