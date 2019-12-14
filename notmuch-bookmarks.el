@@ -52,6 +52,16 @@
 (defcustom notmuch-bookmark-prefix "notmuch: "
   "Prefix to add to new notmuch bookmarks, or nil.")
 
+;; Integrating in bookmarks package:
+
+(defun notmuch-bookmarks-sync-updates ()
+  "Keep bmenu and saved bookmarks in sync with changes."
+  (setq bookmark-alist-modification-count
+	(1+ bookmark-alist-modification-count))
+  (if (bookmark-time-to-save-p)
+      (bookmark-save))
+  (bookmark-bmenu-surreptitiously-rebuild-list))
+
 ;;; Jumping to a Bookmark:
 
 (defun notmuch-bookmarks-assert-major-mode (a-major-mode)
