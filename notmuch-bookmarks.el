@@ -206,9 +206,6 @@
 				    (called-interactively-p))
     (funcall orig-fun bookmark-name)))
 
-(advice-add 'bookmark-relocate
-	    :around 'notmuch-bookmarks-relocate-wrapper)
-
 ;; Install or uninstall the bookmark functionality:
 
 (defun notmuch-bookmarks-set-record-fn ()
@@ -218,12 +215,17 @@ Function to be added to a major mode hook."
   (setq-local bookmark-make-record-function 'notmuch-bookmarks-record))
 
 (defun notmuch-bookmarks-install (&optional uninstall)
-  "Add or optionally remove notmuch bookmark handlers."
+  "Set up all hooks and advices for `notmuch-bookmarks-mode'."
   (let* ((hook-fn (if uninstall 'remove-hook 'add-hook)))
     (seq-doseq (hook-name '(notmuch-show-mode-hook
 			    notmuch-search-mode-hook
 			    notmuch-tree-mode-hook))
-      (funcall hook-fn hook-name 'notmuch-bookmarks-set-record-fn))))
+      (funcall hook-fn hook-name 'notmuch-bookmarks-set-record-fn)))
+  (if uninstall
+      (advice-remove 'bookmark-relocate
+		     'notmuch-bookmarks-relocate-wrapper)
+    (advice-add 'bookmark-relocate
+	    :around 'notmuch-bookmarks-relocate-wrapper)))
 
 (define-minor-mode notmuch-bookmarks
   "Add notmuch specific bookmarks to the bookmarking system."
