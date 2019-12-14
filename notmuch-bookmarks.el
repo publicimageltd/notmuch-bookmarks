@@ -49,7 +49,7 @@
 
 ;;; Custom Variables:
 
-(defcustom notmuch-bookmark-prefix "notmuch: "
+(defcustom notmuch-bookmarks-prefix "notmuch: "
   "Prefix to add to new notmuch bookmarks, or nil.")
 
 ;; Integrating in bookmarks package:
@@ -121,7 +121,7 @@
 					      a-buffer-name
 					      filename position annotation)
   "Turn argument list into a bookmark record list."
-  `(,(concat notmuch-bookmark-prefix name)
+  `(,(concat notmuch-bookmarks-prefix name)
     (handler  . ,handler)
     (filename . ,filename)
     (major-mode . ,a-major-mode)
