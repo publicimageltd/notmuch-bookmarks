@@ -27,7 +27,7 @@ This package adds a global minor mode which allows you to bookmark
 
 # Customizable Variables
 
-## notmuch-bookmark-prefix 
+## notmuch-bookmarks-prefix 
 
 String which prefixes newly created bookmarks. If nil, do not prefix
 anything. Defaults to `notmuch:`.
