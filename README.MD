@@ -49,11 +49,7 @@ Edit the name of the bookmark the current buffer is visiting.
  - Multiple buffer names (which are usually handled by `uniquify`) are
    not handled well. It's just too cumbersome to debug.
 
-# Future
-
-Currently there is a function which provides access to all notmuch
-specific buffers via "counsel". This function will be removed in
-future releases.
+# What else?
 
 There is an add-on package in production which allows to add "alerts"
 to notmuch bookmarks, thus turning the bookmark feature into a viable
