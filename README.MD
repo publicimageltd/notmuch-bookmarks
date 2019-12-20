@@ -52,6 +52,12 @@ Edit the query with the bookmark the current buffer is visiting.
 
 Edit the name of the bookmark the current buffer is visiting.
 
+## notmuch-bookmarks-set-search-type
+
+Set a new search type for the bookmark the current buffer is visiting.
+The new type can be either `notmuch tree` or `notmuch search`.
+Switching to and from a notmuch show mode buffer is not possible.
+
 # Known Limitations
 
  - Multiple buffer names (which are usually handled by `uniquify`) are
