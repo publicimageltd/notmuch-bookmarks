@@ -15,7 +15,7 @@ This package adds a global minor mode which allows you to bookmark
 (use-package notmuch-bookmarks
    :after notmuch
    :config
-   (notmuch-bookmarks))
+   (notmuch-bookmarks-mode))
 ```
 
  This package is NOT part of the official notmuch emacs suite.
@@ -23,7 +23,8 @@ This package adds a global minor mode which allows you to bookmark
 # Features
 
  - Specific jump handlers for notmuch buffers
- - Some API
+ - Some interactive functions to ease working with these kind of
+   bookmarks
 
 # Customizable Variables
 

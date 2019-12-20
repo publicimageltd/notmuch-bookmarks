@@ -264,7 +264,7 @@ Function to be added to a major mode hook."
     (advice-add 'bookmark-relocate
 	    :around 'notmuch-bookmarks-relocate-wrapper)))
 
-(define-minor-mode notmuch-bookmarks
+(define-minor-mode notmuch-bookmarks-mode
   "Add notmuch specific bookmarks to the bookmarking system."
   :global t
   (notmuch-bookmarks-install (not notmuch-bookmarks)))
