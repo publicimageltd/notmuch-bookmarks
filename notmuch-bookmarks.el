@@ -69,8 +69,8 @@
   (unless (seq-contains '(notmuch-show-mode notmuch-tree-mode notmuch-search-mode) a-major-mode)
     (user-error "Notmuch bookmarks does not support major mode '%s' " a-major-mode)))
 
-(defun notmuch-bookmarks-create (query major-mode)
-  "Create a notmuch buffer of type MAJOR-MODE for query."
+(defun notmuch-bookmarks-visit (query major-mode)
+  "Visit a notmuch buffer of type MAJOR-MODE and open QUERY."
   (cl-case major-mode
     (notmuch-tree-mode   (notmuch-tree query))
     (notmuch-show-mode   (notmuch-show query))
@@ -87,7 +87,7 @@
     (cl-assert (stringp .filename)    nil "Bad definition of bookmark query")
     ;; either open existing buffer or create fresh one:
     (if (not (get-buffer .buffer-name))
-	(notmuch-bookmarks-create .filename .major-mode)
+	(notmuch-bookmarks-visit .filename .major-mode)
       (switch-to-buffer .buffer-name)
       (message "This buffer might not be up to date; you may want to refresh it"))))
 
@@ -204,7 +204,7 @@
 	(bookmark-prop-set bookmark 'filename new-query)
 	(when called-interactively
 	  (kill-buffer calling-buf))
-	(notmuch-bookmarks-create new-query (bookmark-prop-get bookmark 'major-mode))
+	(notmuch-bookmarks-visit new-query (bookmark-prop-get bookmark 'major-mode))
 	(bookmark-prop-set bookmark 'buffer-name (buffer-name))
 	(notmuch-bookmarks-sync-updates)
 	(message "Bookmark has been changed")))))
@@ -226,7 +226,7 @@
 	(bookmark-prop-set bookmark 'major-mode (car (assoc-default new-type types #'string=)))
 	(when called-interactively
 	  (kill-buffer calling-buf))
-	(notmuch-bookmarks-create (bookmark-prop-get bookmark 'filename) (bookmark-prop-get bookmark 'major-mode))
+	(notmuch-bookmarks-visit (bookmark-prop-get bookmark 'filename) (bookmark-prop-get bookmark 'major-mode))
 	(bookmark-prop-set bookmark 'buffer-name (buffer-name))
 	(notmuch-bookmarks-sync-updates)
 	(message "Bookmark has been changed")))))
