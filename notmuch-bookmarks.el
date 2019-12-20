@@ -209,6 +209,28 @@
 	(notmuch-bookmarks-sync-updates)
 	(message "Bookmark has been changed")))))
 
+;;;###autoload
+(defun notmuch-bookmarks-set-search-type (&optional bookmark called-interactively)
+  "Set the search type (tree or search) of notmuch bookmark BOOKMARK."
+  (interactive (list (notmuch-bookmarks-get-buffer-bookmark) t))
+  (if (not bookmark)
+      (user-error "No bookmark defined")
+    (if (not (notmuch-bookmarks-record-p bookmark))
+	(user-error "Bookmark not a notmuch bookmark")
+      (let* ((calling-buf    (current-buffer))
+	     (old-type       (bookmark-prop-get bookmark 'major-mode))
+	     (types          '(("notmuch search" notmuch-search-mode) ("notmuch tree" notmuch-tree-mode)))
+	     (types-by-mode  (seq-map #'seq-reverse types))
+	     (new-type       (completing-read (format " Change search type from '%s' to " (assoc-default old-type types-by-mode))
+					      types nil t)))
+	(bookmark-prop-set bookmark 'major-mode (car (assoc-default new-type types #'string=)))
+	(when called-interactively
+	  (kill-buffer calling-buf))
+	(notmuch-bookmarks-create (bookmark-prop-get bookmark 'filename) (bookmark-prop-get bookmark 'major-mode))
+	(bookmark-prop-set bookmark 'buffer-name (buffer-name))
+	(notmuch-bookmarks-sync-updates)
+	(message "Bookmark has been changed")))))
+
 ;; Let bookmark-relocate handle notmuch bookmarks:
 
 (defun notmuch-bookmarks-relocate-wrapper (orig-fun bookmark-name)
