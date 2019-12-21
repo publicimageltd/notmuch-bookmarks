@@ -59,6 +59,29 @@ Set a new search type for the bookmark the current buffer is visiting.
 The new type can be either `notmuch tree` or `notmuch search`.
 Switching to and from a notmuch show mode buffer is not possible.
 
+# Hydra
+
+``` emacs-lisp
+;; Cancel hydra if not called in a bookmarked buffer:
+(defun notmuch-bookmarks-quit-if-no-bookmark ()
+    (interactive)
+    (unless (notmuch-bookmarks-get-buffer-bookmark)
+      (user-error "No bookmark associated with current buffer")))
+	  
+;; The hydra:
+  (defhydra notmuch-bookmarks-shortcuts (:color blue :hint none
+						:body-pre notmuch-bookmarks-quit-if-no-bookmark)
+"
+For current buffer:
+[_e_] Edit query               [_s_] Set search type
+[_n_] Edit name                [_q_]uit
+"
+    ("e" notmuch-bookmarks-edit-query)
+    ("n" notmuch-bookmarks-edit-name)
+    ("s" notmuch-bookmarks-set-search-type)
+    ("q" nil))
+```
+
 # Known Limitations
 
  - Multiple buffer names (which are usually handled by `uniquify`) are
