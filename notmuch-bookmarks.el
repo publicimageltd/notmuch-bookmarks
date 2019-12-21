@@ -267,7 +267,7 @@ Function to be added to a major mode hook."
 (define-minor-mode notmuch-bookmarks-mode
   "Add notmuch specific bookmarks to the bookmarking system."
   :global t
-  (notmuch-bookmarks-install (not notmuch-bookmarks)))
+  (notmuch-bookmarks-install (not notmuch-bookmarks-mode)))
 
 (provide 'notmuch-bookmarks)
 ;;; notmuch-bookmarks.el ends here
