@@ -49,6 +49,10 @@ The notmuch bookmarks are also included in the display of
 function to display only notmuch bookmarks: In `bookmark-bmenu-mode',
 just press 'N' to narrow to notmuch bookmarks.
 
+## notmuch-bookmarks-bmenu
+
+Open or update the bookmarks menu. Only display notmuch bookmarks.
+
 ## notmuch-bookmarks-edit-query
 
 Edit the query with the bookmark the current buffer is visiting.
@@ -63,7 +67,10 @@ Set a new search type for the bookmark the current buffer is visiting.
 The new type can be either `notmuch tree` or `notmuch search`.
 Switching to and from a notmuch show mode buffer is not possible.
 
-# Hydra
+# Keybinding
+
+For easier editing, I recommend to use a hydra or something. This is
+one possible hydra:
 
 ``` emacs-lisp
 ;; Cancel hydra if not called in a bookmarked buffer:
