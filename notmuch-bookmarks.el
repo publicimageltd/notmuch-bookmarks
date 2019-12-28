@@ -1,9 +1,13 @@
-;;; notmuch-bookmarks.el --- add bookmark handling for notmuch buffers  -*- lexical-binding: t; -*-
+;;; notmuch-bookmarks.el --- Add bookmark handling for notmuch buffers  -*- lexical-binding: t; -*-
 
-;; Copyright (C) 2019  
+;; Copyright (C) 2019
 
-;; Author:  <joerg@joergvolbers.de>
+;; Author:  Jörg Volbers <joerg@joergvolbers.de>
+;; Package-Version: 0.1
+;; Version: 0.1
 ;; Keywords: mail
+;; Package-Requires: ((seq "2.20") (emacs "26.1"))
+;; URL: https://github.com/publicimageltd/notmuch-bookmarks
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -21,7 +25,7 @@
 ;;; Commentary:
 
 ;; This package adds a global minor mode which allows you to bookmark
-;; notmuch buffers via the standard emacs bookmark functionality. A
+;; notmuch buffers via the standard Emacs bookmark functionality. A
 ;; `notmuch buffer' denotes either a notmuch tree view, a notmuch
 ;; search view or a notmuch show buffer (message view). With this
 ;; minor mode active, you can add these buffers to the standard
@@ -35,7 +39,7 @@
 ;;   :config
 ;;   (notmuch-bookmarks))
 ;;
-;; This package is NOT part of the official notmuch emacs suite.
+;; This package is NOT part of the official notmuch Emacs suite.
 ;;
 
 ;;; Code:
@@ -43,7 +47,7 @@
 (require 'notmuch)
 
 (require 'cl-lib)
-(require 'seq)   
+(require 'seq)
 (require 'uniquify)
 (require 'bookmark)
 
@@ -55,7 +59,7 @@
 ;; Integrating in bookmarks package:
 
 (defun notmuch-bookmarks-sync-updates ()
-  "Keep bmenu and saved bookmarks in sync with changes."
+  "Save bookmarks and sync with `bookmark-bmenu'."
   (setq bookmark-alist-modification-count
 	(1+ bookmark-alist-modification-count))
   (if (bookmark-time-to-save-p)
@@ -95,7 +99,7 @@
 
 (cl-defgeneric notmuch-bookmarks-get-buffer-query (&optional buffer)
   "Return the notmuch query of BUFFER."
-  (user-error "Not defined for this type of buffer."))
+  (user-error "Not defined for this type of buffer"))
 
 (cl-defmethod notmuch-bookmarks-get-buffer-query (&context (major-mode notmuch-tree-mode) &optional buffer)
   "Return the query for notmuch tree mode BUFFER."
@@ -111,7 +115,6 @@
   "Return the query for notmuch search mode BUFFER."
   (with-current-buffer (or buffer (current-buffer))
     (notmuch-show-get-query)))
-
 
 ;;; Creating a Bookmark:
 
@@ -179,7 +182,9 @@
 
 ;;;###autoload
 (defun notmuch-bookmarks-edit-name (&optional bookmark called-interactively)
-  "Edit the name of notmuch bookmark BOOKMARK."
+  "Edit the name of notmuch bookmark BOOKMARK.
+If BOOKMARK is nil, use current buffer's bookmark.
+If CALLED-INTERACTIVELY, visit the new bookmark after editing."
   (interactive (list (notmuch-bookmarks-get-buffer-bookmark) t))
   (if (not bookmark)
       (user-error "No bookmark defined")
@@ -192,7 +197,9 @@
 
 ;;;###autoload
 (defun notmuch-bookmarks-edit-query (&optional bookmark called-interactively)
-  "Edit the query of notmuch bookmark BOOKMARK."
+  "Edit the query of notmuch bookmark BOOKMARK.
+If BOOKMARK is nil, use current buffer's bookmark.
+If CALLED-INTERACTIVELY, visit the new bookmark after editing."
   (interactive (list (notmuch-bookmarks-get-buffer-bookmark) t))
   (if (not bookmark)
       (user-error "No bookmark defined")
@@ -211,7 +218,9 @@
 
 ;;;###autoload
 (defun notmuch-bookmarks-set-search-type (&optional bookmark called-interactively)
-  "Set the search type (tree or search) of notmuch bookmark BOOKMARK."
+  "Set the search type (tree or search) of notmuch bookmark BOOKMARK.
+If BOOKMARK is nil, use current buffer's bookmark.
+If CALLED-INTERACTIVELY, visit the new bookmark after editing."
   (interactive (list (notmuch-bookmarks-get-buffer-bookmark) t))
   (if (not bookmark)
       (user-error "No bookmark defined")
@@ -221,7 +230,7 @@
 	     (old-type       (bookmark-prop-get bookmark 'major-mode)))
 	(if (old-type 'notmuch-show-mode)
 	    ;; FIXME is this really the case?
-	    (user-error "Notmuch show is special and cannot be changed to another search type.")
+	    (user-error "Notmuch show is special and cannot be changed to another search type")
 	  (let* ((types          '(("notmuch search" notmuch-search-mode) ("notmuch tree" notmuch-tree-mode)))
 		 (types-by-mode  (seq-map #'seq-reverse types))
 		 (new-type       (completing-read (format " Change search type from '%s' to " (assoc-default old-type types-by-mode))
@@ -237,7 +246,9 @@
 ;; Let bookmark-relocate handle notmuch bookmarks:
 
 (defun notmuch-bookmarks-relocate-wrapper (orig-fun bookmark-name)
-  "Treat notmuch bookmarks differently when 'relocating' bookmarks."
+  "Treat notmuch bookmarks differently when 'relocating' bookmarks.
+ORIG-FUN should point to the original function `bookmark-relocate'; 
+BOOKMARK-NAME is the name of the bookmark to relocate."
   (if (notmuch-bookmarks-record-p bookmark-name)
       (notmuch-bookmarks-edit-query bookmark-name
 				    (called-interactively-p))
@@ -252,7 +263,8 @@ Function to be added to a major mode hook."
   (setq-local bookmark-make-record-function 'notmuch-bookmarks-record))
 
 (defun notmuch-bookmarks-install (&optional uninstall)
-  "Set up all hooks and advices for `notmuch-bookmarks-mode'."
+  "Install bookmarking for notmuch buffers.
+If UNINSTALL is set, uninstall it instead."
   (let* ((hook-fn (if uninstall 'remove-hook 'add-hook)))
     (seq-doseq (hook-name '(notmuch-show-mode-hook
 			    notmuch-search-mode-hook
@@ -264,6 +276,7 @@ Function to be added to a major mode hook."
     (advice-add 'bookmark-relocate
 	    :around 'notmuch-bookmarks-relocate-wrapper)))
 
+;;;###autoload
 (define-minor-mode notmuch-bookmarks-mode
   "Add notmuch specific bookmarks to the bookmarking system."
   :global t
