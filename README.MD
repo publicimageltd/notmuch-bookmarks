@@ -1,5 +1,5 @@
 # notmuch-bookmarks
-Bookmark handling for notmuch buffers
+Bookmark handling for notmuch buffers.
 
 This package adds a global minor mode which allows you to bookmark
  notmuch buffers via the standard emacs bookmark functionality. A
@@ -22,9 +22,9 @@ This package adds a global minor mode which allows you to bookmark
 
 # Features
 
- - Specific jump handlers for notmuch buffers
- - Some interactive functions to ease working with these kind of
-   bookmarks
+ - Specific jump handlers for notmuch buffers.
+ - Interactive functions to change the bookmark.
+ - Filter bookmark menu to display only notmuch bookmarks.
 
 # Customizable Variables
 
@@ -40,10 +40,14 @@ anything. Defaults to `notmuch:`.
 In order to use this package, you can use the ordinary bookmark
 functionality shipped with vanilla emacs. That is, when in a notmuch
 buffer, you might simply set a bookmark the usual way (via
-`bookmark-set`). The notmuch bookmarks are also included in the
-display of `bookmark-bmenu-list`. You can use the search feature (key
-'/') to narrow down the bookmark lists to all bookmarks with the prefix
-`notmuch:`.
+`bookmark-set`). 
+
+## Using the bookmark menu
+
+The notmuch bookmarks are also included in the display of
+`bookmark-bmenu-list`. The notmuch bookmarks mode implements a filter
+function to display only notmuch bookmarks: In `bookmark-bmenu-mode',
+just press 'N' to narrow to notmuch bookmarks.
 
 ## notmuch-bookmarks-edit-query
 
