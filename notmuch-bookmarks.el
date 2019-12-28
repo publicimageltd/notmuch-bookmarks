@@ -45,7 +45,6 @@
 ;;; Code:
 
 (require 'notmuch)
-
 (require 'cl-lib)
 (require 'seq)
 (require 'uniquify)
@@ -56,6 +55,9 @@
 (defcustom notmuch-bookmarks-prefix "notmuch: "
   "Prefix to add to new notmuch bookmarks, or nil.")
 
+(defvar notmuch-bookmarks-bmenu-original-keymap nil
+  "Storage for original keymap of `bookmarks-bmenu'.")
+
 ;; Integrating in bookmarks package:
 
 (defun notmuch-bookmarks-sync-updates ()
@@ -65,6 +67,14 @@
   (if (bookmark-time-to-save-p)
       (bookmark-save))
   (bookmark-bmenu-surreptitiously-rebuild-list))
+
+(defun notmuch-bookmarks-bmenu ()
+  "Display bookmark menu only with notmuch bookmarks."
+  (interactive)
+  (let* ((bookmark-alist (seq-filter #'notmuch-bookmarks-record-p bookmark-alist)))
+    (if (called-interactively-p 'interactive)
+	(call-interactively 'bookmark-bmenu-list)
+      (bookmark-bmenu-list))))
 
 ;;; Jumping to a Bookmark:
 
@@ -265,22 +275,32 @@ Function to be added to a major mode hook."
 (defun notmuch-bookmarks-install (&optional uninstall)
   "Install bookmarking for notmuch buffers.
 If UNINSTALL is set, uninstall it instead."
+  ;; install/uninstall hooks:
   (let* ((hook-fn (if uninstall 'remove-hook 'add-hook)))
     (seq-doseq (hook-name '(notmuch-show-mode-hook
 			    notmuch-search-mode-hook
 			    notmuch-tree-mode-hook))
       (funcall hook-fn hook-name 'notmuch-bookmarks-set-record-fn)))
+  ;; install/uninstall advices:
   (if uninstall
       (advice-remove 'bookmark-relocate
 		     'notmuch-bookmarks-relocate-wrapper)
     (advice-add 'bookmark-relocate
-	    :around 'notmuch-bookmarks-relocate-wrapper)))
+		:around 'notmuch-bookmarks-relocate-wrapper))
+  ;; edit bmenu keymap:
+  (if uninstall
+      (when notmuch-bookmarks-bmenu-original-keymap
+	(setq bookmark-bmenu-mode-map notmuch-bookmarks-bmenu-original-keymap))
+    (setq notmuch-bookmarks-bmenu-original-keymap (copy-keymap bookmark-bmenu-mode-map))
+    (define-key bookmark-bmenu-mode-map "N" 'notmuch-bookmarks-bmenu)))
 
 ;;;###autoload
 (define-minor-mode notmuch-bookmarks-mode
   "Add notmuch specific bookmarks to the bookmarking system."
   :global t
   (notmuch-bookmarks-install (not notmuch-bookmarks-mode)))
+
+
 
 (provide 'notmuch-bookmarks)
 ;;; notmuch-bookmarks.el ends here
