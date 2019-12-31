@@ -134,7 +134,7 @@
 					      a-buffer-name
 					      filename position annotation)
   "Turn argument list into a bookmark record list."
-  `(,(concat notmuch-bookmarks-prefix name)
+  `(,(or name (concat notmuch-bookmarks-prefix filename))
     (handler  . ,handler)
     (filename . ,filename)
     (major-mode . ,a-major-mode)
