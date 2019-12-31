@@ -3,7 +3,7 @@
 ;; Copyright (C) 2019
 
 ;; Author:  Jörg Volbers <joerg@joergvolbers.de>
-;; Version: 0.1
+;; version: 0.1
 ;; Keywords: mail
 ;; Package-Requires: ((seq "2.20") (emacs "26.1") notmuch)
 ;; URL: https://github.com/publicimageltd/notmuch-bookmarks
@@ -72,7 +72,7 @@
   (interactive)
   (let* ((bookmark-alist (seq-filter #'notmuch-bookmarks-record-p bookmark-alist)))
     (if (called-interactively-p 'interactive)
-	(call-interactively 'bookmark-bmenu-list)
+	(call-interactively #'bookmark-bmenu-list)
       (bookmark-bmenu-list))))
 
 ;;; Jumping to a Bookmark:
@@ -283,9 +283,9 @@ If UNINSTALL is set, uninstall it instead."
   ;; install/uninstall advices:
   (if uninstall
       (advice-remove 'bookmark-relocate
-		     'notmuch-bookmarks-relocate-wrapper)
+		     #'notmuch-bookmarks-relocate-wrapper)
     (advice-add 'bookmark-relocate
-		:around 'notmuch-bookmarks-relocate-wrapper))
+		:around #'notmuch-bookmarks-relocate-wrapper))
   ;; edit bmenu keymap:
   (if uninstall
       (when notmuch-bookmarks-bmenu-original-keymap
