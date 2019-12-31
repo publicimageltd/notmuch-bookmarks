@@ -6,7 +6,7 @@
 ;; Package-Version: 0.1
 ;; Version: 0.1
 ;; Keywords: mail
-;; Package-Requires: ((seq "2.20") (emacs "26.1"))
+;; Package-Requires: ((seq "2.20") (emacs "26.1") notmuch)
 ;; URL: https://github.com/publicimageltd/notmuch-bookmarks
 
 ;; This program is free software; you can redistribute it and/or modify
