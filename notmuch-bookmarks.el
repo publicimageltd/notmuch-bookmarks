@@ -238,7 +238,7 @@ If CALLED-INTERACTIVELY, visit the new bookmark after editing."
 	(user-error "Bookmark not a notmuch bookmark")
       (let* ((calling-buf    (current-buffer))
 	     (old-type       (bookmark-prop-get bookmark 'major-mode)))
-	(if (old-type 'notmuch-show-mode)
+	(if (eq old-type 'notmuch-show-mode)
 	    ;; FIXME is this really the case?
 	    (user-error "Notmuch show is special and cannot be changed to another search type")
 	  (let* ((types          '(("notmuch search" notmuch-search-mode) ("notmuch tree" notmuch-tree-mode)))
