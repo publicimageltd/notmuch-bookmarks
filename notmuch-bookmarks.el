@@ -241,7 +241,7 @@ If CALLED-INTERACTIVELY, visit the new bookmark after editing."
 	(if (eq old-type 'notmuch-show-mode)
 	    ;; FIXME is this really the case?
 	    (user-error "Notmuch show is special and cannot be changed to another search type")
-	  (let* ((types          '(("notmuch search" notmuch-search-mode) ("notmuch tree" notmuch-tree-mode)))
+	  (let* ((types          '(("search" notmuch-search-mode) ("tree" notmuch-tree-mode)))
 		 (types-by-mode  (seq-map #'seq-reverse types))
 		 (new-type       (completing-read (format " Change search type from '%s' to " (assoc-default old-type types-by-mode))
 						  types nil t)))
