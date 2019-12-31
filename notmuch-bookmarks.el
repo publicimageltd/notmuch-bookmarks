@@ -44,6 +44,7 @@
 ;;; Code:
 
 (require 'notmuch)
+(require 'subr-x)
 (require 'cl-lib)
 (require 'seq)
 (require 'uniquify)
