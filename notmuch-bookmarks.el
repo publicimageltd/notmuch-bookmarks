@@ -3,7 +3,6 @@
 ;; Copyright (C) 2019
 
 ;; Author:  Jörg Volbers <joerg@joergvolbers.de>
-;; Package-Version: 0.1
 ;; Version: 0.1
 ;; Keywords: mail
 ;; Package-Requires: ((seq "2.20") (emacs "26.1") notmuch)
