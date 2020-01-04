@@ -5,7 +5,7 @@
 ;; Author:  Jörg Volbers <joerg@joergvolbers.de>
 ;; version: 0.1
 ;; Keywords: mail
-;; Package-Requires: ((seq "2.20") (emacs "26.1") notmuch)
+;; Package-Requires: ((seq "2.20") (emacs "26.1") (notmuch "0.29.3"))
 ;; URL: https://github.com/publicimageltd/notmuch-bookmarks
 
 ;; This program is free software; you can redistribute it and/or modify
@@ -86,7 +86,7 @@
     (user-error "Notmuch bookmarks does not support major mode '%s' " a-major-mode)))
 
 (defun notmuch-bookmarks-visit (query the-major-mode)
-  "Visit a notmuch buffer of type MAJOR-MODE and open QUERY."
+  "Visit a notmuch buffer of type THE-MAJOR-MODE and open QUERY."
   (cl-case the-major-mode
     (notmuch-tree-mode   (notmuch-tree query))
     (notmuch-show-mode   (notmuch-show query))
@@ -111,7 +111,7 @@
 
 (cl-defgeneric notmuch-bookmarks-get-buffer-query (&optional buffer)
   "Return the notmuch query of BUFFER."
-  (user-error "Not defined for this type of buffer"))
+  (user-error "Not defined for this type of buffer: %s" buffer))
 
 (cl-defmethod notmuch-bookmarks-get-buffer-query (&context (major-mode notmuch-tree-mode) &optional buffer)
   "Return the query for notmuch tree mode BUFFER."
