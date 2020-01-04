@@ -53,7 +53,9 @@
 ;;; Custom Variables:
 
 (defcustom notmuch-bookmarks-prefix "notmuch: "
-  "Prefix to add to new notmuch bookmarks, or nil.")
+  "Prefix to add to new notmuch bookmarks, or nil."
+  :type 'string
+  :group 'notmuch-bookmarks)
 
 (defvar notmuch-bookmarks-bmenu-original-keymap nil
   "Storage for original keymap of `bookmarks-bmenu'.")
@@ -83,9 +85,9 @@
   (unless (seq-contains '(notmuch-show-mode notmuch-tree-mode notmuch-search-mode) a-major-mode)
     (user-error "Notmuch bookmarks does not support major mode '%s' " a-major-mode)))
 
-(defun notmuch-bookmarks-visit (query major-mode)
+(defun notmuch-bookmarks-visit (query the-major-mode)
   "Visit a notmuch buffer of type MAJOR-MODE and open QUERY."
-  (cl-case major-mode
+  (cl-case the-major-mode
     (notmuch-tree-mode   (notmuch-tree query))
     (notmuch-show-mode   (notmuch-show query))
     (notmuch-search-mode (notmuch-search query))))
@@ -261,7 +263,7 @@ ORIG-FUN should point to the original function `bookmark-relocate';
 BOOKMARK-NAME is the name of the bookmark to relocate."
   (if (notmuch-bookmarks-record-p bookmark-name)
       (notmuch-bookmarks-edit-query bookmark-name
-				    (called-interactively-p))
+				    (called-interactively-p 'interactive))
     (funcall orig-fun bookmark-name)))
 
 ;; Install or uninstall the bookmark functionality:
