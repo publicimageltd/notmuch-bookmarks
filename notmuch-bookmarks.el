@@ -83,7 +83,7 @@
 (defun notmuch-bookmarks-assert-major-mode (a-major-mode)
   "Throw an error if A-MAJOR-MODE is not supported by the package `notmuch-bookmarks'."
   (unless (seq-contains '(notmuch-show-mode notmuch-tree-mode notmuch-search-mode) a-major-mode)
-    (user-error "Notmuch bookmarks does not support major mode '%s' " a-major-mode)))
+    (user-error "Notmuch bookmarks does not support major mode: '%s' " a-major-mode)))
 
 (defun notmuch-bookmarks-visit (query the-major-mode)
   "Visit a notmuch buffer of type MAJOR-MODE and open QUERY."
@@ -111,7 +111,7 @@
 
 (cl-defgeneric notmuch-bookmarks-get-buffer-query (&optional buffer)
   "Return the notmuch query of BUFFER."
-  (user-error "Not defined for this type of buffer"))
+  (user-error "Not defined for this type of buffer: %s" buffer))
 
 (cl-defmethod notmuch-bookmarks-get-buffer-query (&context (major-mode notmuch-tree-mode) &optional buffer)
   "Return the query for notmuch tree mode BUFFER."
