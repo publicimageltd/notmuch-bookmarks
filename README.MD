@@ -69,8 +69,8 @@ Switching to and from a notmuch show mode buffer is not possible.
 
 # Keybinding
 
-For easier editing, I recommend to use a hydra or something. This is
-one possible hydra:
+For easier editing, I recommend to use a hydra or something similar.
+This is one possible hydra:
 
 ``` emacs-lisp
 ;; Cancel hydra if not called in a bookmarked buffer:
