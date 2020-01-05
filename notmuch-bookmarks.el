@@ -5,7 +5,7 @@
 ;; Author:  Jörg Volbers <joerg@joergvolbers.de>
 ;; version: 0.1
 ;; Keywords: mail
-;; Package-Requires: ((seq "2.20") (emacs "26.1") notmuch)
+;; Package-Requires: ((seq "2.20") (emacs "26.1") (notmuch "0.29.3"))
 ;; URL: https://github.com/publicimageltd/notmuch-bookmarks
 
 ;; This program is free software; you can redistribute it and/or modify
