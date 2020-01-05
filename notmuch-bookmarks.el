@@ -86,7 +86,7 @@
     (user-error "Notmuch bookmarks does not support major mode: '%s' " a-major-mode)))
 
 (defun notmuch-bookmarks-visit (query the-major-mode)
-  "Visit a notmuch buffer of type MAJOR-MODE and open QUERY."
+  "Visit a notmuch buffer of type THE-MAJOR-MODE and open QUERY."
   (cl-case the-major-mode
     (notmuch-tree-mode   (notmuch-tree query))
     (notmuch-show-mode   (notmuch-show query))
