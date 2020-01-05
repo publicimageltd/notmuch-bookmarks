@@ -193,10 +193,9 @@
 			  bookmark-alist))))
 
 ;;;###autoload
-(defun notmuch-bookmarks-edit-name (&optional bookmark called-interactively)
+(defun notmuch-bookmarks-edit-name (&optional bookmark)
   "Edit the name of notmuch bookmark BOOKMARK.
-If BOOKMARK is nil, use current buffer's bookmark.
-If CALLED-INTERACTIVELY, visit the new bookmark after editing."
+If BOOKMARK is nil, use current buffer's bookmark."
   (interactive (list (notmuch-bookmarks-get-buffer-bookmark) t))
   (if (not bookmark)
       (user-error "No bookmark defined")
