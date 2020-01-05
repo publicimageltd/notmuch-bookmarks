@@ -36,7 +36,7 @@
 ;; (use-package notmuch-bookmarks
 ;;   :after notmuch
 ;;   :config
-;;   (notmuch-bookmarks))
+;;   (notmuch-bookmarks-mode))
 ;;
 ;; This package is NOT part of the official notmuch Emacs suite.
 ;;
