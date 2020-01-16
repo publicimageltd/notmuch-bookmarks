@@ -157,7 +157,7 @@
     ;; error if called within an unrecognized buffer:
     (user-error "Could not find a query associated with the current buffer, no bookmark made")))
 
-;; Diverse usefull stuff for working with bookmarks:
+;; Diverse useful stuff for working with bookmarks:
 
 (defun notmuch-bookmarks-copy-bookmark (bookmark)
   "Copies BOOKMARK and discards any additional data, e.g. alerts."
