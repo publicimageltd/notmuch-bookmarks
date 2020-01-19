@@ -60,6 +60,12 @@
 (defvar notmuch-bookmarks-bmenu-original-keymap nil
   "Storage for original keymap of `bookmarks-bmenu'.")
 
+(defcustom notmuch-bookmarks-bmenu-filter-key "N"
+  "Define this key in the bookmarks menu to filter out notmuch bookmarks.
+If this value is nil, do not implement any key."
+  :type 'string
+  :group 'notmuch-bookmarks)
+
 ;; Integrating in bookmarks package:
 
 (defun notmuch-bookmarks-sync-updates ()
@@ -289,11 +295,12 @@ If UNINSTALL is set, uninstall it instead."
     (advice-add 'bookmark-relocate
 		:around #'notmuch-bookmarks-relocate-wrapper))
   ;; edit bmenu keymap:
-  (if uninstall
-      (when notmuch-bookmarks-bmenu-original-keymap
-	(setq bookmark-bmenu-mode-map notmuch-bookmarks-bmenu-original-keymap))
-    (setq notmuch-bookmarks-bmenu-original-keymap (copy-keymap bookmark-bmenu-mode-map))
-    (define-key bookmark-bmenu-mode-map "N" 'notmuch-bookmarks-bmenu)))
+  (when notmuch-bookmarks-bmenu-filter-key
+    (if uninstall
+	(when notmuch-bookmarks-bmenu-original-keymap
+	  (setq bookmark-bmenu-mode-map notmuch-bookmarks-bmenu-original-keymap))
+      (setq notmuch-bookmarks-bmenu-original-keymap (copy-keymap bookmark-bmenu-mode-map))
+      (define-key bookmark-bmenu-mode-map notmuch-bookmarks-bmenu-filter-key 'notmuch-bookmarks-bmenu))))
 
 ;;;###autoload
 (define-minor-mode notmuch-bookmarks-mode
