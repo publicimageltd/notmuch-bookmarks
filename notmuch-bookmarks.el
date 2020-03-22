@@ -308,7 +308,5 @@ If UNINSTALL is set, uninstall it instead."
   :global t
   (notmuch-bookmarks-install (not notmuch-bookmarks-mode)))
 
-
-
 (provide 'notmuch-bookmarks)
 ;;; notmuch-bookmarks.el ends here
