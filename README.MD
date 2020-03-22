@@ -12,7 +12,7 @@ This package adds a global minor mode which allows you to bookmark
  To activate the minor mode, add something like the following to
  your `.init` file:
 
-```
+```emacs-lisp 
 (use-package notmuch-bookmarks
    :after notmuch
    :config
@@ -49,11 +49,18 @@ favorite completion system (i.e. ivy or counsel).
 
 Notmuch bookmarks are also included in the display of
 `bookmark-bmenu-list`. The notmuch bookmarks mode implements a filter
-function to display only notmuch bookmarks: In `bookmark-bmenu-mode',
-just press 'N' to narrow to notmuch bookmarks.
+function to display only notmuch bookmarks: In `bookmark-bmenu-mode`,
+just press 'N' to narrow to notmuch bookmarks. 
 
-To call the bookmark menu with only notmuch bookmarks displayed, use
-the interactive command `notmuch-bookmarks-bmenu`.
+You can customize this key by setting
+`notmuch-bookmarks-bmenu-filter-key` to the key string. Turn the minor
+mode off and on again to see the effect. 
+
+Setting this variable to `nil` removes any special key binding (this
+has to be done when the minor mode itself is turned off).
+
+To call the bookmark menu directly restricted to notmuch bookmarks,
+use the interactive command `notmuch-bookmarks-bmenu`.
 
 ## Editing a bookmark
 
