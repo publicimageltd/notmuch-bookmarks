@@ -98,6 +98,7 @@ If this value is nil, do not implement any key."
     (notmuch-show-mode   (notmuch-show query))
     (notmuch-search-mode (notmuch-search query))))
 
+;;;###autoload
 (cl-defun notmuch-bookmarks-jump-handler (bookmark)
   "Standard handler for opening notmuch bookmarks."
   (let* ((.filename    (bookmark-prop-get bookmark 'filename))
