@@ -226,22 +226,23 @@ Optionally return a count of 0 as nil if NO-ZERO is non-nil."
   "Return a query for counting all mails of BOOKMARK."
   (notmuch-bookmarks-query bookmark))
 
-(defun notmuch-bookmarks--annotation (bookmark)
-  "Return an annotation string for BOOKMARK."
-  (let* ((unread-query (notmuch-bookmarks--unread-mails-query bookmark))
-         (unread-count (when unread-query (notmuch-bookmarks--count unread-query t)))
-         (total-query  (notmuch-bookmarks--total-mails-query bookmark))
-         (total-count  (when total-query (notmuch-bookmarks--count total-query))))
-  (concat
-   (when (and unread-query unread-count)
-     (propertize (format "%d unread mails" unread-count)
-                 'face 'notmuch-tag-unread))
-   (when (and unread-count total-query)
-     "; ")
-   (when total-query
-     (format "%d mails" total-count))
-   (when (or unread-count total-query)
-     "."))))
+(defun notmuch-bookmarks--annotation (cand)
+  "Return an annotation string for CAND."
+  (when-let ((bookmark (assoc cand bookmark-alist)))
+    (let* ((unread-query (notmuch-bookmarks--unread-mails-query bookmark))
+           (unread-count (when unread-query (notmuch-bookmarks--count unread-query t)))
+           (total-query  (notmuch-bookmarks--total-mails-query bookmark))
+           (total-count  (when total-query (notmuch-bookmarks--count total-query))))
+      (concat
+       (when (and unread-query unread-count)
+         (propertize (format "%d unread mails" unread-count)
+                     'face 'notmuch-tag-unread))
+       (when (and unread-count total-query)
+         "; ")
+       (when total-query
+         (format "%d mails" total-count))
+       (when (or unread-count total-query)
+         ".")))))
 
 (defun notmuch-bookmarks-get-annotation (bookmark)
   "Return an annotation for BOOKMARK."
