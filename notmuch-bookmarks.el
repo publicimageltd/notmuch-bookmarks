@@ -211,6 +211,9 @@ Throw an error if there is none."
 
 ;; Add special annotation function:
 
+;; NOTE Possible speed optimizations:
+;; - query read and unread mails in one call using `notmuch count --batch'
+
 (defun notmuch-bookmarks--count (query &optional no-zero)
   "Get the number of mails matching QUERY.
 Optionally return a count of 0 as nil if NO-ZERO is non-nil."
