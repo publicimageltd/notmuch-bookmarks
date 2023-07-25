@@ -38,6 +38,10 @@
 ;;   :config
 ;;   (notmuch-bookmarks-mode))
 ;;
+;; There is experimental support for providing annotations which count
+;; the read and unread mails for the bookmarks. Currently, annotations
+;; do only work when the package `marginalia' is installed. Turn on
+;; this feature with `notmuch-bookmarks-annotation-mode'.
 
 ;;; Code:
 
