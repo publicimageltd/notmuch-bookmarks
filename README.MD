@@ -32,6 +32,10 @@ This package adds a global minor mode which allows you to bookmark
 String which prefixes newly created bookmarks. If nil, do not prefix
 anything. Defaults to `notmuch:`.
 
+## notmuch-bookmarks-bmenu-filter-key
+
+Key to narrow the bookmarks in the interactive bookmark menu (see below).
+
 # Interactive Functions
 
 ## Generic bookmark handling
