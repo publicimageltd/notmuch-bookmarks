@@ -46,6 +46,9 @@
 (require 'seq)
 (require 'bookmark)
 
+(declare-function marginalia-annotate-bookmark "marginalia")
+(defvar marginalia-annotator-registry)
+
 ;;; Variables:
 
 (defvar notmuch-bookmarks-bmenu-original-keymap nil
@@ -98,8 +101,8 @@ Specialized method for `notmuch-show-mode'."
 ;; Bookmarking a query here means to store the query and the buffer's
 ;; major mode. Supported major modes are hard wired since extending it
 ;; requires writing a method with a new major mode as specializing
-;; context and extending `notmuch-bookmarks--visit' as well as
-;; `notmuch-bookmarks--install'.
+;; context and extending `notmuch-bookmarks--visit', as well as
+;; extending `notmuch-bookmarks--install'.
 
 (defun notmuch-bookmarks-supported-major-mode-p (a-major-mode)
   "Check if A-MAJOR-MODE is supported."
@@ -206,6 +209,63 @@ Throw an error if there is none."
           (bookmark-bmenu-list)))
     (user-error "No notmuch bookmarks registered")))
 
+;; Add special annotation function:
+
+(defun notmuch-bookmarks--count (query)
+  "Get the number of mails matching QUERY."
+  (string-to-number (notmuch-command-to-string "count" query)))
+
+(defun notmuch-bookmarks--unread-mails-query (bookmark)
+  "Return a query for counting unread mails of BOOKMARK."
+  (when-let ((query (notmuch-bookmarks-query bookmark)))
+    (concat "(" query ") AND tag:unread")))
+
+(defun notmuch-bookmarks--total-mails-query (bookmark)
+  "Return a query for counting all mails of BOOKMARK."
+  (notmuch-bookmarks-query bookmark))
+
+(defun notmuch-bookmarks--annotation (bookmark)
+  "Return an annotation string for BOOKMARK."
+  (let ((unread-query (notmuch-bookmarks--unread-mails-query bookmark))
+        (total-query  (notmuch-bookmarks--total-mails-query bookmark)))
+  (concat
+   (when unread-query
+     (format "%d unread mails" (notmuch-bookmarks--count unread-query)))
+   (when (and unread-query total-query)
+     "; ")
+   (when total-query
+     (format "%d mails" (notmuch-bookmarks--count total-query)))
+   (when (or unread-query total-query)
+     "."))))
+
+(defun notmuch-bookmarks-get-annotation (bookmark)
+  "Return an annotation for BOOKMARK."
+  (concat
+   (when (featurep 'marginalia)
+     (concat (marginalia-annotate-bookmark bookmark) " "))
+   (when (notmuch-bookmarks-record-p bookmark)
+     (notmuch-bookmarks--annotation bookmark))))
+
+(defun notmuch-bookmarks--install-annotations (&optional uninstall)
+  "Install annotation for notmuch bookmarks.
+Optionally UNINSTALL it."
+  ;; register with marginalia
+  (with-eval-after-load 'marginalia
+    (let ((annotation-assoc '(bookmark notmuch-bookmarks-get-annotation)))
+      (if uninstall
+          (setq marginalia-annotator-registry
+                (seq-remove (lambda (l)
+                              (when (listp l)
+                                (equal l annotation-assoc)))
+                            marginalia-annotator-registry))
+        (add-to-list 'marginalia-annotator-registry
+                     annotation-assoc))))
+  ;; or register as an annotation function
+  ;; TODO
+  )
+
+
+
 ;; Install or uninstall the bookmark functionality:
 
 (defun notmuch-bookmarks-set-record-fn ()
@@ -242,6 +302,13 @@ instead."
   :group 'notmuch-bookmarks
   :global t
   (notmuch-bookmarks--install (not notmuch-bookmarks-mode)))
+
+;;;###autoload
+(define-minor-mode notmuch-bookmarks-annotation-mode
+  "Add annotations for notmuch bookmarks."
+  :group 'notmuch-bookmarks
+  :global t
+  (notmuch-bookmarks--install-annotations (not notmuch-bookmarks-annotation-mode)))
 
 (provide 'notmuch-bookmarks)
 ;;; notmuch-bookmarks.el ends here

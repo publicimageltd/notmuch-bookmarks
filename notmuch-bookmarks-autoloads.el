@@ -45,6 +45,36 @@ it is disabled.
 
 \(fn &optional ARG)" t nil)
 
+(defvar notmuch-bookmarks-annotation-mode nil "\
+Non-nil if Notmuch-Bookmarks-Annotation mode is enabled.
+See the `notmuch-bookmarks-annotation-mode' command
+for a description of this minor mode.
+Setting this variable directly does not take effect;
+either customize it (see the info node `Easy Customization')
+or call the function `notmuch-bookmarks-annotation-mode'.")
+
+(custom-autoload 'notmuch-bookmarks-annotation-mode "flycheck_notmuch-bookmarks" nil)
+
+(autoload 'notmuch-bookmarks-annotation-mode "flycheck_notmuch-bookmarks" "\
+Add annotations for notmuch bookmarks.
+
+This is a minor mode.  If called interactively, toggle the
+`Notmuch-Bookmarks-Annotation mode' mode.  If the prefix argument
+is positive, enable the mode, and if it is zero or negative,
+disable the mode.
+
+If called from Lisp, toggle the mode if ARG is `toggle'.  Enable
+the mode if ARG is nil, omitted, or is a positive number.
+Disable the mode if ARG is a negative number.
+
+To check whether the minor mode is enabled in the current buffer,
+evaluate `(default-value \\='notmuch-bookmarks-annotation-mode)'.
+
+The mode's hook is called both when the mode is enabled and when
+it is disabled.
+
+\(fn &optional ARG)" t nil)
+
 (register-definition-prefixes "flycheck_notmuch-bookmarks" '("notmuch-bookmarks-"))
 
 ;;;***
@@ -82,6 +112,36 @@ Disable the mode if ARG is a negative number.
 
 To check whether the minor mode is enabled in the current buffer,
 evaluate `(default-value \\='notmuch-bookmarks-mode)'.
+
+The mode's hook is called both when the mode is enabled and when
+it is disabled.
+
+\(fn &optional ARG)" t nil)
+
+(defvar notmuch-bookmarks-annotation-mode nil "\
+Non-nil if Notmuch-Bookmarks-Annotation mode is enabled.
+See the `notmuch-bookmarks-annotation-mode' command
+for a description of this minor mode.
+Setting this variable directly does not take effect;
+either customize it (see the info node `Easy Customization')
+or call the function `notmuch-bookmarks-annotation-mode'.")
+
+(custom-autoload 'notmuch-bookmarks-annotation-mode "notmuch-bookmarks" nil)
+
+(autoload 'notmuch-bookmarks-annotation-mode "notmuch-bookmarks" "\
+Add annotations for notmuch bookmarks.
+
+This is a minor mode.  If called interactively, toggle the
+`Notmuch-Bookmarks-Annotation mode' mode.  If the prefix argument
+is positive, enable the mode, and if it is zero or negative,
+disable the mode.
+
+If called from Lisp, toggle the mode if ARG is `toggle'.  Enable
+the mode if ARG is nil, omitted, or is a positive number.
+Disable the mode if ARG is a negative number.
+
+To check whether the minor mode is enabled in the current buffer,
+evaluate `(default-value \\='notmuch-bookmarks-annotation-mode)'.
 
 The mode's hook is called both when the mode is enabled and when
 it is disabled.
