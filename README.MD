@@ -9,6 +9,10 @@ This package adds a global minor mode which allows you to bookmark
  active, you can add notmuch buffers to the standard bookmark list and
  visit them, e.g. by using `bookmark-jump`.
 
+There is experimental support for providing annotations which count
+ the read and unread mails for the bookmarks. Currently, annotations
+ do only work when the package `marginalia'`is installed.
+
  To activate the minor mode, add something like the following to
  your `.init` file:
 
@@ -16,7 +20,9 @@ This package adds a global minor mode which allows you to bookmark
 (use-package notmuch-bookmarks
    :after notmuch
    :config
-   (notmuch-bookmarks-mode))
+   (notmuch-bookmarks-mode)
+   ;; turn on annotations counting read/unread mails
+   (notmuch-bookmarks-annotation-mode))
 ```
 
 # Features
@@ -24,6 +30,8 @@ This package adds a global minor mode which allows you to bookmark
  - Specific jump handlers for notmuch buffers.
  - Filter the pre-installed emacs bookmark menu to display only
    notmuch bookmarks.
+ - Display annotations showing count of read, unread mails
+   (experimental; currently only with support for `marginalia`).
 
 # Customizable Variables
 
@@ -72,5 +80,4 @@ The package does not bind any keys by itself.
 There is an [add-on package](https://github.com/publicimageltd/notmuch-alerts) which
 allows to add "alerts" to notmuch bookmarks, thus turning the bookmark
 feature into a viable alternative to the notmuch hello buffer.
-Bookmarks can then be used to register new or unread mails. The
-package is not in melpa yet, but I use it without any problems.
+Bookmarks can then be used to register new or unread mails. 
