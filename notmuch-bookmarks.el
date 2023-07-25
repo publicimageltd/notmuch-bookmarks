@@ -233,7 +233,7 @@ Optionally return a count of 0 as nil if NO-ZERO is non-nil."
   "Return an annotation string for CAND."
   (when-let ((bookmark (assoc cand bookmark-alist)))
     (let* ((unread-query (notmuch-bookmarks--unread-mails-query bookmark))
-           (unread-count (when unread-query (notmuch-bookmarks--count unread-query t)))
+           (unread-count (when unread-query (notmuch-bookmarks--count unread-query :no-zero)))
            (total-query  (notmuch-bookmarks--total-mails-query bookmark))
            (total-count  (when total-query (notmuch-bookmarks--count total-query))))
       (concat
