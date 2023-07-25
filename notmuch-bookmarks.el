@@ -211,9 +211,11 @@ Throw an error if there is none."
 
 ;; Add special annotation function:
 
-(defun notmuch-bookmarks--count (query)
-  "Get the number of mails matching QUERY."
-  (string-to-number (notmuch-command-to-string "count" query)))
+(defun notmuch-bookmarks--count (query &optional no-zero)
+  "Get the number of mails matching QUERY.
+Optionally return a count of 0 as nil if NO-ZERO is non-nil."
+  (let ((count (string-to-number (notmuch-command-to-string "count" query))))
+    (if (and no-zero (eq count 0)) nil count)))
 
 (defun notmuch-bookmarks--unread-mails-query (bookmark)
   "Return a query for counting unread mails of BOOKMARK."
@@ -226,16 +228,19 @@ Throw an error if there is none."
 
 (defun notmuch-bookmarks--annotation (bookmark)
   "Return an annotation string for BOOKMARK."
-  (let ((unread-query (notmuch-bookmarks--unread-mails-query bookmark))
-        (total-query  (notmuch-bookmarks--total-mails-query bookmark)))
+  (let* ((unread-query (notmuch-bookmarks--unread-mails-query bookmark))
+         (unread-count (when unread-query (notmuch-bookmarks--count unread-query t)))
+         (total-query  (notmuch-bookmarks--total-mails-query bookmark))
+         (total-count  (when total-query (notmuch-bookmarks--count total-query))))
   (concat
-   (when unread-query
-     (format "%d unread mails" (notmuch-bookmarks--count unread-query)))
-   (when (and unread-query total-query)
+   (when (and unread-query unread-count)
+     (propertize (format "%d unread mails" unread-count)
+                 'face 'notmuch-tag-unread))
+   (when (and unread-count total-query)
      "; ")
    (when total-query
-     (format "%d mails" (notmuch-bookmarks--count total-query)))
-   (when (or unread-query total-query)
+     (format "%d mails" total-count))
+   (when (or unread-count total-query)
      "."))))
 
 (defun notmuch-bookmarks-get-annotation (bookmark)
@@ -246,25 +251,28 @@ Throw an error if there is none."
    (when (notmuch-bookmarks-record-p bookmark)
      (notmuch-bookmarks--annotation bookmark))))
 
+
+(defun notmuch-bookmarks--register-with-marginalia (&optional unregister)
+  "Register annotations with marginalia.
+Optionally UNREGISTER them."
+  (let ((annotation-assoc '(bookmark notmuch-bookmarks-get-annotation)))
+    (if unregister
+        (setq marginalia-annotator-registry
+              (seq-remove (lambda (l)
+                            (when (listp l)
+                              (equal l annotation-assoc)))
+                          marginalia-annotator-registry))
+      (add-to-list 'marginalia-annotator-registry
+                   annotation-assoc))))
+
 (defun notmuch-bookmarks--install-annotations (&optional uninstall)
   "Install annotation for notmuch bookmarks.
-Optionally UNINSTALL it."
-  ;; register with marginalia
+Optionally UNINSTALL this feature.
+
+Do not call this function directly; use
+`notmuch-bookmarks-annotation-mode' instead."
   (with-eval-after-load 'marginalia
-    (let ((annotation-assoc '(bookmark notmuch-bookmarks-get-annotation)))
-      (if uninstall
-          (setq marginalia-annotator-registry
-                (seq-remove (lambda (l)
-                              (when (listp l)
-                                (equal l annotation-assoc)))
-                            marginalia-annotator-registry))
-        (add-to-list 'marginalia-annotator-registry
-                     annotation-assoc))))
-  ;; or register as an annotation function
-  ;; TODO
-  )
-
-
+    (notmuch-bookmarks--register-with-marginalia uninstall)))
 
 ;; Install or uninstall the bookmark functionality:
 
