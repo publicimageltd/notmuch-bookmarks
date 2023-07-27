@@ -11,7 +11,7 @@
 ;;; Generated autoloads from flycheck_notmuch-bookmarks.el
 
 (autoload 'notmuch-bookmarks-jump-handler "flycheck_notmuch-bookmarks" "\
-Open BOOKMARK as a notmuch query.
+Open BOOKMARK or switch to its visiting buffer.
 
 \(fn BOOKMARK)" nil nil)
 
@@ -84,7 +84,7 @@ it is disabled.
 ;;; Generated autoloads from notmuch-bookmarks.el
 
 (autoload 'notmuch-bookmarks-jump-handler "notmuch-bookmarks" "\
-Open BOOKMARK as a notmuch query.
+Open BOOKMARK or switch to its visiting buffer.
 
 \(fn BOOKMARK)" nil nil)
 

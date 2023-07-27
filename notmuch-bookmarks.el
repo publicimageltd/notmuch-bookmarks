@@ -174,7 +174,7 @@ Throw an error if there is none."
 
 ;;;###autoload
 (defun notmuch-bookmarks-jump-handler (bookmark)
-  "Open BOOKMARK as a notmuch query."
+  "Open BOOKMARK or switch to its visiting buffer."
   (let* ((.filename    (bookmark-prop-get bookmark 'filename))
          (.major-mode  (bookmark-prop-get bookmark 'major-mode)))
     ;; do some sanity checks:
@@ -213,7 +213,7 @@ Throw an error if there is none."
           (bookmark-bmenu-list)))
     (user-error "No notmuch bookmarks registered")))
 
-;; Add special annotation function:
+;; Completion annotation:
 
 ;; NOTE Possible speed optimizations:
 ;; - query read and unread mails in one call using `notmuch count --batch'
@@ -281,6 +281,38 @@ Do not call this function directly; use
 `notmuch-bookmarks-annotation-mode' instead."
   (with-eval-after-load 'marginalia
     (notmuch-bookmarks--register-with-marginalia uninstall)))
+
+;; Edit current buffer's bookmark
+
+(defun notmuch-bookmarks--reload-current-bookmark ()
+  "Reload current buffer's bookmark."
+  (if-let ((bmk bookmark-current-bookmark))
+      (progn
+        (kill-buffer)
+        (bookmark-jump bmk)
+        (message "Bookmark has been changed"))
+    (user-error "Buffer has no current bookmark")))
+
+(defun notmuch-bookmarks-edit-name (bookmark-name)
+  ;; checkdoc-params: (bookmark-name)
+  "Edit current buffer's bookmark name."
+  (interactive (list bookmark-current-bookmark))
+  (unless bookmark-name
+    (user-error "Buffer has no current bookmark"))
+  (let ((new-name (read-string "Edit bookmark name: " bookmark-name)))
+    (bookmark-set-name bookmark-name new-name)
+    (setq-local bookmark-current-bookmark new-name)
+    (notmuch-bookmarks--reload-current-bookmark)))
+
+(defun notmuch-bookmarks-edit-query (bookmark-name)
+  ;; checkdoc-params: (bookmark-name)
+  "Edit current buffer's bookmark query."
+  (interactive (list bookmark-current-bookmark))
+  (unless bookmark-name
+    (user-error "Buffer has no current bookmark"))
+  (let ((new-query (read-string "Edit notmuch query: " (notmuch-bookmarks-query bookmark-name))))
+    (bookmark-prop-set bookmark-name 'filename new-query)
+    (notmuch-bookmarks--reload-current-bookmark)))
 
 ;; Install or uninstall the bookmark functionality:
 
