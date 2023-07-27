@@ -29,6 +29,7 @@ There is experimental support for providing annotations which count
 # Features
 
  - Specific jump handlers for notmuch buffers.
+ - Edit name or query of bookmarked buffer directly.
  - Filter the pre-installed emacs bookmark menu to display only
    notmuch bookmarks.
  - Display annotations showing count of read, unread mails
@@ -56,6 +57,12 @@ functionality shipped with vanilla emacs. That is, when in a notmuch
 buffer, you might simply set a bookmark the usual way (via
 `bookmark-set`).  Alternatively, you can set bookmarks using your
 favorite completion system (i.e. ivy or counsel).
+
+## Editing bookmarks in place
+
+In a bookmarked buffer, use `notmuch-bookmarks-edit-name` or
+`notmuch-bookmarks-edit-query` to edit the name or the query,
+respectively.
 
 ## Using the bookmark menu
 
