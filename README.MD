@@ -22,6 +22,7 @@ There is experimental support for providing annotations which count
    :config
    (notmuch-bookmarks-mode)
    ;; turn on annotations counting read/unread mails
+   ;; currently requires 'marginalia' installed
    (notmuch-bookmarks-annotation-mode))
 ```
 
@@ -32,6 +33,8 @@ There is experimental support for providing annotations which count
    notmuch bookmarks.
  - Display annotations showing count of read, unread mails
    (experimental; currently only with support for `marginalia`).
+ - Establish notmuch bookmark as a category in `consult-bookmark` so
+   that it is displayed in a separate group and can be narrowed ("n").
 
 # Customizable Variables
 
@@ -58,7 +61,7 @@ favorite completion system (i.e. ivy or counsel).
 
 Notmuch bookmarks are also included in the `bookmark-bmenu-list`.
 Notmuch bookmarks mode implements a filter function to display only
-notmuch bookmarks: When visiting the bmenu list, ust press 'N' to
+notmuch bookmarks: When visiting the bmenu list, just press 'N' to
 narrow to notmuch bookmarks.
 
 You can customize this by setting `notmuch-bookmarks-bmenu-filter-key`
@@ -73,7 +76,9 @@ command `notmuch-bookmarks-bmenu`.
 
 # Keybinding
 
-The package does not bind any keys by itself. 
+The package does not bind any global keys by itself. If `consult`is
+installed, pressing "n" in `consult-bookmark' narrows to all availbale
+notmuch bookmarks.
 
 # What else?
 
