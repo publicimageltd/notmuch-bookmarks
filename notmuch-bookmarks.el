@@ -293,6 +293,7 @@ Do not call this function directly; use
         (message "Bookmark has been changed"))
     (user-error "Buffer has no current bookmark")))
 
+;;;###autoload
 (defun notmuch-bookmarks-edit-name (bookmark-name)
   ;; checkdoc-params: (bookmark-name)
   "Edit current buffer's bookmark name."
@@ -304,6 +305,7 @@ Do not call this function directly; use
     (setq-local bookmark-current-bookmark new-name)
     (notmuch-bookmarks--reload-current-bookmark)))
 
+;;;###autoload
 (defun notmuch-bookmarks-edit-query (bookmark-name)
   ;; checkdoc-params: (bookmark-name)
   "Edit current buffer's bookmark query."

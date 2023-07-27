@@ -15,6 +15,16 @@ Open BOOKMARK or switch to its visiting buffer.
 
 \(fn BOOKMARK)" nil nil)
 
+(autoload 'notmuch-bookmarks-edit-name "flycheck_notmuch-bookmarks" "\
+Edit current buffer's bookmark name.
+
+\(fn BOOKMARK-NAME)" t nil)
+
+(autoload 'notmuch-bookmarks-edit-query "flycheck_notmuch-bookmarks" "\
+Edit current buffer's bookmark query.
+
+\(fn BOOKMARK-NAME)" t nil)
+
 (defvar notmuch-bookmarks-mode nil "\
 Non-nil if Notmuch-Bookmarks mode is enabled.
 See the `notmuch-bookmarks-mode' command
@@ -87,6 +97,16 @@ it is disabled.
 Open BOOKMARK or switch to its visiting buffer.
 
 \(fn BOOKMARK)" nil nil)
+
+(autoload 'notmuch-bookmarks-edit-name "notmuch-bookmarks" "\
+Edit current buffer's bookmark name.
+
+\(fn BOOKMARK-NAME)" t nil)
+
+(autoload 'notmuch-bookmarks-edit-query "notmuch-bookmarks" "\
+Edit current buffer's bookmark query.
+
+\(fn BOOKMARK-NAME)" t nil)
 
 (defvar notmuch-bookmarks-mode nil "\
 Non-nil if Notmuch-Bookmarks mode is enabled.
