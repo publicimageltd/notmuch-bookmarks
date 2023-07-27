@@ -181,10 +181,10 @@ Throw an error if there is none."
     ;; (cl-assert always calls the debugger, so we do it manually:)
     (unless (notmuch-bookmarks-supported-major-mode-p .major-mode)
       (user-error "Notmuch bookmarks does not support major mode %s" .major-mode))
-    (unless (not (null .filename))
-      (user-error "Empty query string in bookmark record"))
+    (unless .filename
+      (user-error "No query string in bookmark record"))
     (unless (stringp .filename)
-      (user-error "Bad definition of bookmark query"))
+      (user-error "Bookmark query has to be a string"))
     ;;
     (let ((buf (notmuch-bookmarks--get-buffer .filename .major-mode)))
       (if (not buf)
