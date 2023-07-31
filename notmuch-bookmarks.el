@@ -320,7 +320,7 @@ Do not call this function directly; use
   (interactive (list bookmark-current-bookmark))
   (unless bookmark-name
     (user-error "Buffer has no current bookmark"))
-  (let ((new-query (read-string "Edit notmuch query: " (notmuch-bookmarks-query bookmark-name))))
+  (let ((new-query (notmuch-read-query " Enter notmuch query:")))
     (bookmark-prop-set bookmark-name 'filename new-query)
     (notmuch-bookmarks--reload-current-bookmark)))
 
