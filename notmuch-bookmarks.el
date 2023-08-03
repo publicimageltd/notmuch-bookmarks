@@ -348,15 +348,6 @@ instead."
       (if uninstall
           (kill-local-variable 'bookmark-make-record-function)
         (notmuch-bookmarks-set-record-fn))))
-  ;; add to consult bookmarking for narrowing:
-  (let ((consult-narrow-entry
-         `(?n "Notmuch" ,#'notmuch-bookmarks-jump-handler)))
-    (with-eval-after-load 'consult
-      (when (bound-and-true-p consult-bookmark-narrow)
-        (setq consult-bookmark-narrow
-              (if uninstall
-                  (cl-remove consult-narrow-entry consult-bookmark-narrow :test #'equal)
-                (cons consult-narrow-entry consult-bookmark-narrow))))))
   ;; edit bmenu keymap:
   (when notmuch-bookmarks-bmenu-filter-key
     (if uninstall
@@ -378,6 +369,21 @@ instead."
   :group 'notmuch-bookmarks
   :global t
   (notmuch-bookmarks--install-annotations (not notmuch-bookmarks-annotation-mode)))
+
+;;;###autoload
+(define-minor-mode notmuch-bookmarks-consult-mode
+  "Integrate notmuch bookmarks into consult."
+  :group 'notmuch-bookmarks
+  :global t
+  :require 'consult
+  (let ((consult-narrow-entry
+         `(?n "Notmuch" ,#'notmuch-bookmarks-jump-handler)))
+    (when (bound-and-true-p consult-bookmark-narrow)
+      (setq consult-bookmark-narrow
+            (if (not notmuch-bookmarks-consult-mode)
+                (cl-remove consult-narrow-entry consult-bookmark-narrow :test #'equal)
+              (cons consult-narrow-entry consult-bookmark-narrow))))))
+
 
 (provide 'notmuch-bookmarks)
 ;;; notmuch-bookmarks.el ends here

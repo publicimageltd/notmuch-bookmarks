@@ -12,6 +12,11 @@ This package adds a global minor mode which allows you to bookmark
 There is experimental support for providing annotations which count
  the read and unread mails for the bookmarks. Currently, annotations
  do only work when the package `marginalia'`is installed.
+ 
+ Furthermore, there is another global minor mode
+ `notmuch-bookmarks-consult-mode` which toggles integration with the
+ `consult` package. Currently, it adds a narrowing feature to
+ `consult-bookmark': pressing 'n' will narrow to all notmuch bookmarks.
 
  To activate the minor mode, add something like the following to
  your `.init` file:
@@ -34,8 +39,7 @@ There is experimental support for providing annotations which count
    notmuch bookmarks.
  - Display annotations showing count of read, unread mails
    (experimental; currently only with support for `marginalia`).
- - Establish notmuch bookmark as a category in `consult-bookmark` so
-   that it is displayed in a separate group and can be narrowed ("n").
+ - Optional integration with `consult`
 
 # Customizable Variables
 
@@ -83,9 +87,10 @@ command `notmuch-bookmarks-bmenu`.
 
 # Keybinding
 
-The package does not bind any global keys by itself. If `consult`is
-installed, pressing "n" in `consult-bookmark' narrows to all availbale
-notmuch bookmarks.
+The package does not change any keybindings. Use the optional
+`notmuch-bookmarks-consult-mode` to bind the prefix key 'n' in the
+consult bookmarks selection to a narrowed view of all Notmuch
+bookmarks..
 
 # What else?
 
