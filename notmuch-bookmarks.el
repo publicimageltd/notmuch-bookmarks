@@ -51,7 +51,7 @@
 (require 'bookmark)
 
 (declare-function marginalia-annotate-bookmark "marginalia")
-(defvar marginalia-annotator-registry)
+(defvar marginalia-annotators)
 
 ;;; Variables:
 
