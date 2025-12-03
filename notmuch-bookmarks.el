@@ -1,6 +1,6 @@
 ;;; notmuch-bookmarks.el --- Add bookmark handling for notmuch buffers  -*- lexical-binding: t; -*-
 
-;; Copyright (C) 2019
+;; Copyright (C) 2019-2025
 
 ;; Author:  Jörg Volbers <joerg@joergvolbers.de>
 ;; version: 0.2
