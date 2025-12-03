@@ -126,20 +126,22 @@ Specialized method for `notmuch-show-mode'."
   (let* ((query (notmuch-bookmarks-get-buffer-query))
          (name  (concat notmuch-bookmarks-prefix query)))
     `(,name
-      (handler    . ,#'notmuch-bookmarks-jump-handler)
-      (filename   . ,query)
-      (major-mode . ,major-mode))))
+      (handler      . ,#'notmuch-bookmarks-jump-handler)
+      (filename     . ,query)
+      (major-mode   . ,major-mode)
+      (oldest-first . ,notmuch-search-oldest-first))))
 
 (defun notmuch-bookmarks-record-p (bookmark)
   "Test whether BOOKMARK points to a notmuch query."
   (eq 'notmuch-bookmarks-jump-handler (bookmark-prop-get bookmark 'handler)))
 
-(defun notmuch-bookmarks--visit (query the-major-mode)
-  "Visit a notmuch buffer of type THE-MAJOR-MODE and open QUERY."
+(defun notmuch-bookmarks--visit (query the-major-mode oldest-first)
+  "Visit a notmuch buffer of type THE-MAJOR-MODE and open QUERY.
+Also set the order of the results to OLDEST-FIRST."
   (cl-case the-major-mode
-    (notmuch-tree-mode   (notmuch-tree query))
+    (notmuch-tree-mode   (notmuch-tree query nil nil nil nil nil nil oldest-first))
     (notmuch-show-mode   (notmuch-show query))
-    (notmuch-search-mode (notmuch-search query))
+    (notmuch-search-mode (notmuch-search query oldest-first))
     (t (user-error "No notmuch command associated with %s" the-major-mode))))
 
 (defun notmuch-bookmarks--all-buffers ()
@@ -175,8 +177,9 @@ Throw an error if there is none."
 ;;;###autoload
 (defun notmuch-bookmarks-jump-handler (bookmark)
   "Open BOOKMARK or switch to its visiting buffer."
-  (let* ((.filename    (bookmark-prop-get bookmark 'filename))
-         (.major-mode  (bookmark-prop-get bookmark 'major-mode)))
+  (let* ((.filename     (bookmark-prop-get bookmark 'filename))
+         (.major-mode   (bookmark-prop-get bookmark 'major-mode))
+         (.oldest-first (bookmark-prop-get bookmark 'oldest-first)))
     ;; do some sanity checks:
     ;; (cl-assert always calls the debugger, so we do it manually:)
     (unless (notmuch-bookmarks-supported-major-mode-p .major-mode)
@@ -188,8 +191,13 @@ Throw an error if there is none."
     ;;
     (let ((buf (notmuch-bookmarks--get-buffer .filename .major-mode)))
       (if (not buf)
-          (notmuch-bookmarks--visit .filename .major-mode)
+          (notmuch-bookmarks--visit .filename .major-mode .oldest-first)
         (switch-to-buffer buf)
+        ;; Update order of results if necessary
+        (unless (eq .oldest-first notmuch-search-oldest-first)
+          (cl-case .major-mode
+            (notmuch-tree-mode (notmuch-tree-toggle-order))
+            (notmuch-search-mode (notmuch-search-toggle-order))))
         (message "This buffer might not be up to date; you may want to refresh it")))))
 
 ;; Integrate in bookmarks package:
