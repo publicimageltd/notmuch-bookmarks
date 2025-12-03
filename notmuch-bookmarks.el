@@ -250,12 +250,12 @@ Optionally return a count of 0 as nil if NO-ZERO is non-nil."
            (total-count  (when total-query (notmuch-bookmarks--count total-query))))
       (concat
        (when (and unread-query unread-count)
-         (propertize (format "%d unread mails" unread-count)
+         (propertize (format "%d unread" unread-count)
                      'face 'notmuch-tag-unread))
        (when (and unread-count total-query)
-         "; ")
+         "/")
        (when total-query
-         (format "%d mails" total-count))
+         (format "%d total" total-count))
        (when (or unread-count total-query)
          ".")))))
 
@@ -271,14 +271,16 @@ Optionally return a count of 0 as nil if NO-ZERO is non-nil."
 (defun notmuch-bookmarks--register-with-marginalia (&optional unregister)
   "Register annotations with marginalia.
 Optionally UNREGISTER them."
+  (unless (boundp 'marginalia-annotators)
+    (user-error "Cannot register annotation function"))
   (let ((annotation-assoc '(bookmark notmuch-bookmarks-get-annotation)))
     (if unregister
-        (setq marginalia-annotator-registry
+        (setq marginalia-annotators
               (seq-remove (lambda (l)
                             (when (listp l)
                               (equal l annotation-assoc)))
-                          marginalia-annotator-registry))
-      (add-to-list 'marginalia-annotator-registry
+                          marginalia-annotators))
+      (add-to-list 'marginalia-annotators
                    annotation-assoc))))
 
 (defun notmuch-bookmarks--install-annotations (&optional uninstall)
